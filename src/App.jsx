@@ -876,7 +876,7 @@ export default function App() {
   const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
-    document.title = `${names} – Wedding invitation`;
+    document.title = `M&M – Wedding invitation`;
   }, []);
 
   useEffect(() => {
