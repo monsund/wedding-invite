@@ -1,56 +1,34 @@
 // EDIT THIS FILE: every detail on the invitation comes from here.
 
 export const CONFIG = {
-  partner1: "Mayuri",
-  partner2: "Monsoon",
-  introLine: "A letter has arrived for you",
+  partner1: "Mayuri", // bride, shown on the left of the cover
+  partner2: "Monsoon", // groom, shown on the right
 
   welcomeTitle: "To the big day",
   welcomeText:
-    "We’re getting married, and we would love to have you with us. This page has everything you need to know. Take a look around, then let us know if you can make it.",
+    "We’re getting married, and it would mean the world to us to have you by our side as we begin this new chapter. Come celebrate with us and our families in Haflong and Maibang.",
 
-  eventTitle: "Mayuri & Monsoon’s wedding",
-  dateLabel: "Sunday, 14 February 2027",
-  startISO: "20270214T103000", // local start, YYYYMMDDTHHMMSS
-  endISO: "20270214T233000",
+  dateLabel: "12 & 13 January 2027",
+  countdownTo: "2027-01-12T00:00:00+05:30", // India time; set the ceremony hour if you know it
 
-  venueName: "The Garden Courtyard",
-  venueAddress: "12 Lake Road, Your City, State 000000",
-  mapQuery: "The Garden Courtyard, Your City",
-
-  // icon: pin | heart | glass | fork | music
-  schedule: [
-    { time: "3:30 PM", title: "Guest arrival", note: "Light refreshments while everyone settles in", icon: "pin" },
-    { time: "4:00 PM", title: "Ceremony", note: "We exchange vows in the garden courtyard", icon: "heart" },
-    { time: "5:00 PM", title: "Cocktail hour", note: "Drinks, bites and a little mingling", icon: "glass" },
-    { time: "6:30 PM", title: "Dinner and toasts", note: "A shared meal, followed by a few words from loved ones", icon: "fork" },
-    { time: "8:30 PM", title: "First dance and open floor", note: "Dancing until late", icon: "music" },
+  // One entry per ceremony.
+  // mapLink: paste the Google Maps share link for the exact house (Share → Copy link).
+  // Until it is filled in, the map button searches for the address instead.
+  events: [
+    {
+      date: "2027-01-12", place: "Haflong", host: "Bride’s residence",
+      address: "Surat Nagar, Haflong, Assam",
+      mapLink:
+        "https://www.google.com/maps/dir//Community+Hall,+Suratnagar,+Surat+Nagar,+Lodhi+Basti,+Haflong,+Assam+788820/@25.1795052,93.00738,199m/data=!3m1!1e3!4m17!1m8!3m7!1s0x374fa300316b4065:0xd4efc4ba19d23f5a!2sCommunity+Hall,+Suratnagar!8m2!3d25.1795045!4d93.0086043!15sChpzdXJhdCBuYWdhciBjb21tdW5pdHkgaGFsbJIBC3NvY2lhbF9jbHVi4AEA!16s%2Fg%2F11xvxvw0lf!4m7!1m0!1m5!1m1!1s0x374fa300316b4065:0xd4efc4ba19d23f5a!2m2!1d93.0086038!2d25.1795054?entry=ttu&g_ep=EgoyMDI2MTAyMC4wIKXMDSoASAFQAw%3D%3D",
+    },
+    {
+      date: "2027-01-13", place: "Maibang", host: "Groom’s residence",
+      address: "Dima Rajathani, Maibang, Assam",
+      mapLink:
+        "https://www.google.com/maps/place/The+Dibragede+Residence/@25.3138753,93.1262074,795m/data=!3m2!1e3!4b1!4m6!3m5!1s0x374f750020aa754d:0xfa4e49bd07413d83!8m2!3d25.3138705!4d93.1310783!16s%2Fg%2F11zbj288ll?entry=ttu&g_ep=EgoyMDI2MTAyMC4wIKXMDSoASAFQAw%3D%3D",
+    },
   ],
 
-  dressTitle: "Dress code",
-  dressText: "Garden formal. Think soft, flowing fabrics, and shoes you can walk on grass in.",
-  palette: [
-    { name: "Sage", hex: "#8FA58F" },
-    { name: "Dusty rose", hex: "#D9A4AC" },
-    { name: "Ivory", hex: "#F3EBDD" },
-    { name: "Wine", hex: "#7A2E3F" },
-  ],
-  paletteAvoid: "Please leave white and ivory to the bride.",
-
-  stay: [
-    { name: "The Lakeview Hotel", note: "5 minutes from the venue. Mention our names for the guest rate.", link: "https://example.com" },
-    { name: "Courtyard Inn", note: "A quieter option, 10 minutes by car.", link: "https://example.com" },
-  ],
-  stayNote: "Rooms are limited, so please book early.",
-
-  giftsText:
-    "Your presence is the best gift we could ask for. If you would still like to give something, a contribution towards our new home would mean a lot to us.",
-  giftsLink: "", // optional
-  giftsLinkLabel: "See gift details",
-
-  rsvpBy: "10 January 2027",
-  whatsapp: "", // e.g. "919876543210" (country code, no + or spaces). Empty lets the guest pick the contact.
-  email: "", // optional fallback, e.g. "us@example.com"
-
-  closing: "With love, Mayuri & Monsoon",
+  closing: "With love,",
+  closingNote: "We can’t wait to celebrate with you.",
 };
