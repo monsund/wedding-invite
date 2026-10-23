@@ -1,8 +1,8 @@
 // EDIT THIS FILE: every detail on the invitation comes from here.
 
 export const CONFIG = {
-  partner1: "Mayuri", // bride, shown on the left of the cover
-  partner2: "Monsoon", // groom, shown on the right
+  partner1: "Monsoon", // bride, shown on the left of the cover
+  partner2: "Mayuri", // groom, shown on the right
 
   welcomeTitle: "To the big day",
   welcomeText:
