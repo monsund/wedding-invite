@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { Fragment, useEffect, useId, useState } from "react";
 import { CONFIG as C } from "./config.js";
 
 const enc = encodeURIComponent;
@@ -218,18 +218,41 @@ function Couple() {
       <ellipse cx="318" cy="408" rx="4" ry="1.8" fill="var(--rose)" transform="rotate(10 318 408)" />
 
       <Bride>
-        <path d="M150 182c6 18 8 34 7 50" stroke={SKIN} strokeWidth="9" strokeLinecap="round" />
-        <path d="M157 220v6" stroke={GOLD} strokeWidth="10" />
-        <path d="M157 217v2" stroke="var(--rose)" strokeWidth="10" />
+        <Hold x={150} y={182} cls="arm-b">
+          <path d="M150 182c3 9 5 17 5.5 25" stroke={SKIN} strokeWidth="9" strokeLinecap="round" />
+          <Hold x={155.5} y={207} cls="fore-b">
+            <path d="M155.5 207c1.5 8 1.8 17 1.5 25" stroke={SKIN} strokeWidth="9" strokeLinecap="round" />
+            <path d="M157 220v6" stroke={GOLD} strokeWidth="10" />
+            <path d="M157 217v2" stroke="var(--rose)" strokeWidth="10" />
+          </Hold>
+        </Hold>
       </Bride>
 
       <Groom>
-        <Sleeve d="M250 180c-5 18-7 32-7 46" />
+        <Hold x={250} y={180} cls="arm-g">
+          <Hold x={245.5} y={203} cls="fore-g">
+            <Sleeve d="M245.5 203c-1.5 8-2.5 15-2.5 23" />
+          </Hold>
+          <Sleeve d="M250 180c-2.5 9-4 16-4.5 23" />
+        </Hold>
       </Groom>
       <Ribbon />
-      <circle cx="143" cy="236" r="6" fill={SKIN} />
-      <circle cx="257" cy="236" r="6" fill={SKIN} />
     </svg>
+  );
+}
+
+// Gold glints drift out from the bow as it comes undone: [dx, dy]
+const GLINTS = [[-26, -18], [-14, -30], [4, -34], [20, -26], [30, -12], [-30, 4], [26, 8]];
+
+// Rotates part of a ribbon-holding arm about a joint at (x, y) as the ribbon is untied:
+// the upper arm about the shoulder, the forearm about the elbow, and the loose ribbon end
+// about the hand so it keeps hanging down. The arm and the hand with its ribbon sit in
+// different layers, so each layer gets its own Holds with joints in its coordinates.
+function Hold({ x, y, cls, children }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <g className={"hold " + cls}><g transform={`translate(${-x} ${-y})`}>{children}</g></g>
+    </g>
   );
 }
 
@@ -243,25 +266,46 @@ function Ribbon() {
   );
   return (
     <g>
-      <path d="M139 240c-3 18-7 38-14 58l7-2 3 7c6-20 10-42 11-61z" fill="var(--ribbon-dark)"
-        stroke="var(--ribbon-light)" strokeWidth="1.2" strokeLinejoin="round" />
-      <path d="M261 240c3 18 7 38 14 58l-7-2-3 7c-6-20-10-42-11-61z" fill="var(--ribbon-dark)"
-        stroke="var(--ribbon-light)" strokeWidth="1.2" strokeLinejoin="round" />
-      {half("rb-l", 143)}
-      {half("rb-r", 200)}
+      <Hold x={136} y={182} cls="arm-b"><Hold x={141.5} y={207} cls="fore-b">
+        <Hold x={143} y={236} cls="tail-b">
+          <path d="M139 240c-3 18-7 38-14 58l7-2 3 7c6-20 10-42 11-61z" fill="var(--ribbon-dark)"
+            stroke="var(--ribbon-light)" strokeWidth="1.2" strokeLinejoin="round" />
+        </Hold>
+        {half("rb-l", 143)}
+        <circle cx="143" cy="236" r="6" fill={SKIN} />
+      </Hold></Hold>
+      <Hold x={264} y={180} cls="arm-g"><Hold x={259.5} y={203} cls="fore-g">
+        <Hold x={257} y={236} cls="tail-g">
+          <path d="M261 240c3 18 7 38 14 58l-7-2-3 7c-6-20-10-42-11-61z" fill="var(--ribbon-dark)"
+            stroke="var(--ribbon-light)" strokeWidth="1.2" strokeLinejoin="round" />
+        </Hold>
+        {half("rb-r", 200)}
+        <circle cx="257" cy="236" r="6" fill={SKIN} />
+      </Hold></Hold>
       <g transform="translate(200 236) scale(.64) translate(-60 -40)">
         <g className="knot">
-          <path d="M55 44c-6 14-15 26-25 38l8-3 5 7c8-14 14-28 18-41z" fill="var(--ribbon)" />
-          <path d="M65 44c6 14 15 26 25 38l-8-3-5 7c-8-14-14-28-18-41z" fill="var(--ribbon)" />
-          <path d="M60 40C44 18 14 6 8 26c-5 18 22 26 52 14z" fill="var(--ribbon)" />
-          <path d="M60 40c16-22 46-34 52-14 5 18-22 26-52 14z" fill="var(--ribbon)" />
-          <path d="M60 40c-14-10-34-16-40-10 8 4 24 8 40 10zM60 40c14-10 34-16 40-10-8 4-24 8-40 10z"
-            fill="var(--ribbon-dark)" opacity=".55" />
-          <path d="M56 36C42 20 20 12 14 24M64 36c14-16 36-24 42-12" stroke="#fff" strokeOpacity=".3" strokeWidth="1.5" fill="none" />
-          <rect x="51" y="30" width="18" height="21" rx="6" fill="var(--ribbon-dark)" />
-          <rect x="55" y="33" width="4" height="14" rx="2" fill="#fff" opacity=".18" />
+          <g className="bow bow-l">
+            <path d="M55 44c-6 14-15 26-25 38l8-3 5 7c8-14 14-28 18-41z" fill="var(--ribbon)" />
+            <path d="M60 40C44 18 14 6 8 26c-5 18 22 26 52 14z" fill="var(--ribbon)" />
+            <path d="M60 40c-14-10-34-16-40-10 8 4 24 8 40 10z" fill="var(--ribbon-dark)" opacity=".55" />
+            <path d="M56 36C42 20 20 12 14 24" stroke="#fff" strokeOpacity=".3" strokeWidth="1.5" fill="none" />
+          </g>
+          <g className="bow bow-r">
+            <path d="M65 44c6 14 15 26 25 38l-8-3-5 7c-8-14-14-28-18-41z" fill="var(--ribbon)" />
+            <path d="M60 40c16-22 46-34 52-14 5 18-22 26-52 14z" fill="var(--ribbon)" />
+            <path d="M60 40c14-10 34-16 40-10-8 4-24 8-40 10z" fill="var(--ribbon-dark)" opacity=".55" />
+            <path d="M64 36c14-16 36-24 42-12" stroke="#fff" strokeOpacity=".3" strokeWidth="1.5" fill="none" />
+          </g>
+          <g className="wrap">
+            <rect x="51" y="30" width="18" height="21" rx="6" fill="var(--ribbon-dark)" />
+            <rect x="55" y="33" width="4" height="14" rx="2" fill="#fff" opacity=".18" />
+          </g>
         </g>
       </g>
+      {GLINTS.map(([dx, dy], i) => (
+        <circle key={i} className="glint" cx="200" cy="236" r={i % 2 ? 1.6 : 2.2} fill={GOLD}
+          style={{ "--dx": dx + "px", "--dy": dy + "px", animationDelay: 0.5 + i * 0.06 + "s" }} />
+      ))}
     </g>
   );
 }
@@ -318,7 +362,7 @@ function Cover({ onDone }) {
       onDone();
       window.scrollTo(0, 0);
       document.getElementById("screen")?.scrollTo(0, 0);
-    }, reduce ? 50 : 2100);
+    }, reduce ? 50 : 4800);
     return () => clearTimeout(t);
   }, [open, onDone]);
 
@@ -327,6 +371,7 @@ function Cover({ onDone }) {
       role="dialog" aria-label="Wedding invitation">
       <div className="door left"><CoverArt /></div>
       <div className="door right"><CoverArt /></div>
+      <span className="seam" />
       <button className="untie" disabled={open} onClick={() => setOpen(true)}
         aria-label={`Untie the ribbon to open ${names}’s wedding invitation`} />
       <p className="tap">
@@ -457,34 +502,6 @@ function Cloud({ className }) {
   );
 }
 
-function Hills() {
-  const pin = (x, y) => (
-    <g transform={`translate(${x} ${y})`}>
-      <path d="M0 0c-5-6-8-10-8-14a8 8 0 0 1 16 0c0 4-3 8-8 14z" fill="var(--rose)" />
-      <circle cy="-14" r="3" fill="var(--bg)" />
-    </g>
-  );
-  return (
-    <>
-      <Cloud className="c1" />
-      <Cloud className="c2" />
-      <svg className="hills" viewBox="0 0 400 200" stroke="currentColor" strokeWidth=".9">
-        <path d="M0 100C40 60 80 50 120 70s80-30 120-10 90-30 160 10v130H0z" fill="var(--gold)" fillOpacity=".08" />
-        <path d="M0 140c50-30 100-40 150-20s100-30 150-5 70-15 100 5v80H0z" fill="var(--rose-soft)" fillOpacity=".45" />
-        <path d="M0 175c60-20 120-25 180-10s120-15 220 5v30H0z" fill="var(--sage)" fillOpacity=".16" />
-        <path d="M215 200c-20-15 25-28 5-45s-40-20-20-40" fill="none" strokeDasharray="3 4" />
-        <g fill="var(--sage)" fillOpacity=".55" stroke="none">
-          {[[58, 128], [68, 125], [250, 118], [262, 120], [338, 132]].map(([x, y]) => (
-            <path key={x} d={`M${x} ${y}l5-13 5 13z`} />
-          ))}
-        </g>
-        {pin(120, 64)}
-        {pin(318, 92)}
-      </svg>
-    </>
-  );
-}
-
 // [left %, size px, rise seconds, delay seconds]
 const LANTERNS = [
   [12, 20, 22, -3], [28, 14, 26, -14], [46, 24, 20, -9], [64, 16, 24, -1],
@@ -506,7 +523,8 @@ function Lanterns() {
 }
 
 const MOTIFS = {
-  garland: () => <><Garland /><Sparkles /></>, lotus: () => <><Lotus /><Petals /></>, hills: Hills,
+  garland: () => <><Garland /><Sparkles /></>, lotus: () => <><Lotus /><Petals /></>,
+  clouds: () => <><Cloud className="c1" /><Cloud className="c2" /></>,
   lanterns: Lanterns,
 };
 
@@ -518,6 +536,32 @@ function PageBg({ motif }) {
       <div className="hero-frame" />
       <Corner at="tl" /><Corner at="tr" /><Corner at="bl" /><Corner at="br" />
     </div>
+  );
+}
+
+// The bride (first day) or groom (second day) pointing up at their day's calendar button
+function SaveTheDate({ who }) {
+  const bride = who === "bride";
+  // Bubble drawn for the bride, with its tail towards her on the left; flipped for the groom
+  const flip = bride ? undefined : "translate(120 0) scale(-1 1)";
+  const x = bride ? 20 : 100;
+  return (
+    <svg className={"says " + who} viewBox="0 0 120 70" fill="none" aria-hidden="true">
+      <g className="says-bubble">
+        <g transform={flip}>
+          <rect x="40" y="6" width="76" height="26" rx="13" fill="var(--paper)" stroke={GOLD} strokeWidth=".9" />
+          <path d="M51 31 38 38 60 31z" fill="var(--paper)" />
+          <path d="M51 32 38 38 60 32" stroke={GOLD} strokeWidth=".9" strokeLinejoin="round" />
+        </g>
+        <text x={bride ? 78 : 42} y="23" textAnchor="middle" fill="var(--rose)"
+          fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize="11">Save the date!</text>
+      </g>
+      <g className="says-fig">
+        <g transform={`translate(${x} 68) scale(1.6) translate(${-x} -68)`}>
+          <Mini x={x} y={68} kind={who} arms={bride ? [[-2, 11], [6, -12]] : [[-6, -12], [2, 11]]} />
+        </g>
+      </g>
+    </svg>
   );
 }
 
@@ -533,10 +577,10 @@ function Hero() {
         {C.partner2}
       </h1>
       <div className="save">
-        <p className="save-title">Save the date</p>
+        {/* <p className="save-title">Save the date</p> */}
         <p className="save-month">{fmt(EVENTS[0].date, { month: "long", year: "numeric" })}</p>
         <ul className="save-days">
-          {EVENTS.map((e) => (
+          {EVENTS.map((e, i) => (
             <li key={e.place}>
               <span className="save-wd">{fmt(e.date, { weekday: "long" })}</span>
               <strong>{fmt(e.date, { day: "numeric" })}</strong>
@@ -550,11 +594,12 @@ function Hero() {
                 </svg>
                 Add to calendar
               </a>
+              <SaveTheDate who={i ? "groom" : "bride"} />
             </li>
           ))}
         </ul>
       </div>
-      <p className="hint">Scroll for the details</p>
+      {/* <p className="hint">Scroll for the details</p> */}
     </section>
   );
 }
@@ -588,25 +633,8 @@ function Countdown() {
           );
         })}
       </div>
-      <DreamingCouple />
+      <Photobomb />
     </div>
-  );
-}
-
-// Little scenes the couple daydreams about, shown one at a time in the thought bubble
-function Note({ x, y, cls }) {
-  return (
-    <g className={"n " + cls}>
-      <path d={`M${x + 2.4} ${y}v-11l6 2`} stroke={WINE} strokeWidth="1.4" fill="none" />
-      <ellipse cx={x} cy={y} rx="2.8" ry="2.2" fill="var(--rose)" transform={`rotate(-20 ${x} ${y})`} />
-    </g>
-  );
-}
-
-function Heart({ x, y, cls }) {
-  return (
-    <path className={"n " + cls} fill="var(--rose)"
-      d={`M${x} ${y + 3}s-4-2.6-4-5.2a2.2 2.2 0 0 1 4-1.2 2.2 2.2 0 0 1 4 1.2c0 2.6-4 5.2-4 5.2z`} />
   );
 }
 
@@ -617,7 +645,7 @@ const ARMS = {
 };
 
 // A tiny standing figure, feet at (x, y). kind: bride | groom | woman | man
-function Mini({ x, y = 88, kind, top, skirt, arms = "down", cls = "" }) {
+function Mini({ x, y = 88, kind, top, skirt, hair = HAIR, arms = "down", cls = "" }) {
   const female = kind === "bride" || kind === "woman";
   const [[lx, ly], [rx, ry]] = typeof arms === "string" ? ARMS[arms] : arms;
   const sh = y - 23;
@@ -644,174 +672,182 @@ function Mini({ x, y = 88, kind, top, skirt, arms = "down", cls = "" }) {
       )}
       <path d={`M${x - 4} ${sh}l${lx} ${ly}M${x + 4} ${sh}l${rx} ${ry}`} stroke={SKIN} strokeWidth="2.4" strokeLinecap="round" />
       <circle cx={x} cy={y - 29} r="4.5" fill={SKIN} />
-      {female && <circle cx={x - 4} cy={y - 30} r="2.2" fill={HAIR} />}
+      {female && <circle cx={x - 4} cy={y - 30} r="2.2" fill={hair} />}
       {kind === "groom" ? (
         <path d={`M${x - 5.5} ${y - 30}a5.5 5.5 0 0 1 11 0c-2-3-9-3-11 0z`} fill={WHITE} stroke={LINEN} strokeWidth=".5" />
       ) : (
-        <path d={`M${x - 4.6} ${y - 29}a4.6 4.6 0 0 1 9.2 0c-2-3-7-3-9.2 0z`} fill={kind === "bride" ? VEIL : HAIR}
+        <path d={`M${x - 4.6} ${y - 29}a4.6 4.6 0 0 1 9.2 0c-2-3-7-3-9.2 0z`} fill={kind === "bride" ? VEIL : hair}
           opacity={kind === "bride" ? 0.75 : 1} />
       )}
     </g>
   );
 }
 
-// A laughing face and shoulders, for the laughter scene
-function Bust({ x, kind, top, cls }) {
-  const y = 60;
+// The couple poses for a photo and the family piles in: two cousins make bunny ears, an uncle
+// toots a trumpet, and an aunty drags a sulking kid in by the ear. Then everyone wanders off.
+// [caption, duration ms, walk ms, cousin offset, trumpeter offset, aunty offset]; cousin
+// offsets are for the left one and mirrored on the right
+const SCENE = [
+  ["Say cheese!", 1800, 0, -80, -70, 70],
+  ["Wait… who’s that?", 1700, 1500, 0, -70, 70],
+  ["Photobombed!", 2000, 0, 0, -70, 70],
+  ["Po poooo!", 2000, 1400, 0, 0, 70],
+  ["One more for the photo!", 2000, 1500, 0, 0, 0],
+  ["Picture perfect", 2600, 0, 0, 0, 0],
+  ["Picture perfect", 1600, 1400, -80, -70, 70],
+];
+const BLUE = "#6D8FB0";
+
+// Moves a figure sideways; it bobs while walking
+function Actor({ cls, dx, walk, children }) {
   return (
-    <g className={"face " + cls}>
-      {kind === "bride" && <path d={`M${x - 3} ${y - 8}c-8 2-11 14-11 30h6c0-12 2-20 6-26z`} fill={VEIL} opacity=".55" />}
-      <path d={`M${x - 11} 90q0-18 11-18t11 18z`} fill={top} stroke={kind === "groom" ? LINEN : "none"} strokeWidth=".6" />
-      {kind === "bride" && <path d={`M${x - 10} 82h20`} stroke={RED} strokeWidth="3" />}
-      {kind === "groom" && <path d={`M${x - 4} 73v17M${x + 4} 73v17`} stroke={RED} strokeWidth="2" />}
-      <circle cx={x} cy={y} r="8" fill={SKIN} />
-      {kind === "groom" ? (
-        <path d={`M${x - 9} ${y - 1}a9 9 0 0 1 18 0c-3-4-15-4-18 0z`} fill={WHITE} stroke={LINEN} strokeWidth=".6" />
-      ) : (
-        <path d={`M${x - 8} ${y}a8 8 0 0 1 16 0c-3-5-13-5-16 0z`} fill={kind === "bride" ? VEIL : HAIR}
-          opacity={kind === "bride" ? 0.8 : 1} />
-      )}
-      <path d={`M${x - 5} ${y + 1}q1.5-2.5 3 0M${x + 2} ${y + 1}q1.5-2.5 3 0`} stroke={HAIR} strokeWidth="1.1"
-        strokeLinecap="round" fill="none" />
-      <path d={`M${x - 3.5} ${y + 3.5}q3.5 5 7 0z`} fill={WINE} />
+    <g className={`actor ${cls}${walk ? " walk" : ""}`} style={{ transform: `translateX(${dx}px)` }}>
+      <g className="bob">{children}</g>
     </g>
   );
 }
 
-const Steam = ({ xs }) => (
-  <g className="steam" stroke={GOLD} strokeWidth="1" strokeLinecap="round" fill="none">
-    {xs.map((x, i) => <path key={x} className={"s" + (i + 1)} d={`M${x} 58q-2-4 0-8t0-8`} />)}
+const Say = ({ x, y, anchor = "middle", size = 7, cls = "", children }) => (
+  <text className={"say " + cls} x={x} y={y} textAnchor={anchor} fill="var(--rose)"
+    fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize={size}>{children}</text>
+);
+
+const Note = ({ x, y, cls }) => (
+  <g className={"note " + cls}>
+    <path d={`M${x + 2} ${y}v-7l3.5 1.4`} stroke={WINE} strokeWidth="1" />
+    <ellipse cx={x} cy={y} rx="2.3" ry="1.8" fill="var(--rose)" transform={`rotate(-20 ${x} ${y})`} />
   </g>
 );
 
-const Bowl = ({ x, y, fill }) => (
-  <>
-    <path d={`M${x - 10} ${y}a10 7 0 0 0 20 0z`} fill={WHITE} stroke={LINEN} strokeWidth=".8" />
-    <ellipse cx={x} cy={y} rx="10" ry="2.4" fill={fill} />
-  </>
+const Fingers = ({ x, y = 52 }) => (
+  <path d={`M${x} ${y}l-1.8-5M${x} ${y}l1.8-5`} stroke={SKIN} strokeWidth="1.4" strokeLinecap="round" />
 );
 
-const DREAMS = [
-  ["The wedding", (
-    <g>
-      <path d="M170 88V60a30 26 0 0 1 60 0v28" stroke="var(--sage)" strokeWidth="1.6" />
-      <Flower x={200} y={34} r={5} /><Flower x={178} y={44} r={3.5} /><Flower x={222} y={44} r={3.5} />
-      <Flower x={170} y={64} r={3} /><Flower x={230} y={64} r={3} />
-      <Mini x={193} kind="bride" arms={[[-2, 11], [3, 7]]} />
-      <Mini x={207} kind="groom" arms={[[-3, 7], [2, 11]]} />
-      <g className="notes"><Heart x={186} y={48} cls="n1" /><Heart x={214} y={46} cls="n2" /><Heart x={200} y={42} cls="n3" /></g>
-    </g>
-  )],
-  ["Singing", (
-    <g>
-      <Mini x={162} kind="woman" top={WINE} skirt={ORANGE} arms="up" cls="sing" />
-      <Mini x={186} kind="bride" arms="mic" cls="sing d2" />
-      <circle cx="189" cy="60" r="1.8" fill={GOLD} />
-      <Mini x={212} kind="groom" arms="wave" cls="sing" />
-      <Mini x={238} kind="man" top="var(--sage)" arms="up" cls="sing d2" />
-      <g className="notes">
-        <Note x={172} y={50} cls="n1" /><Note x={226} y={46} cls="n2" /><Note x={200} y={44} cls="n3" />
-      </g>
-    </g>
-  )],
-  ["Dancing", (
-    <g>
-      <Mini x={160} kind="woman" top={WINE} skirt={ORANGE} arms="up" cls="hop" />
-      <Mini x={176} kind="man" top="var(--sage)" arms="out" cls="hop d2" />
-      <g className="dancers">
-        <Mini x={193} kind="bride" arms={[[-7, 3], [3, -12]]} />
-        <Mini x={207} kind="groom" arms={[[-3, -12], [7, 3]]} />
-      </g>
-      <Mini x={224} kind="woman" top="var(--rose)" skirt={GREEN} arms="wave" cls="hop" />
-      <Mini x={240} kind="man" top={ORANGE} arms="up" cls="hop d2" />
-      <path d="M150 62q-3 5 0 10M250 60q3 5 0 10" stroke={GOLD} strokeLinecap="round" />
-    </g>
-  )],
-  ["The feast", (
-    <g>
-      <Steam xs={[178, 222, 200]} />
-      <rect x="150" y="86" width="100" height="5" rx="2" fill="var(--rose-soft)" />
-      <path d="M150 86h100" stroke={GOLD} />
-      <Bowl x={178} y={66} fill="#FFFFFF" />
-      <path d="M170 66q8-8 16 0z" fill="#FFFFFF" stroke={LINEN} strokeWidth=".5" />
-      <Bowl x={222} y={66} fill={ORANGE} />
-      <circle cx="218" cy="65.5" r="1.8" fill="#8B4A2B" /><circle cx="224" cy="66.5" r="1.6" fill="#8B4A2B" />
-      <circle cx="227" cy="65" r="1.2" fill="var(--sage)" />
-      <ellipse cx="168" cy="82" rx="15" ry="4.5" fill={WHITE} stroke={LINEN} strokeWidth=".8" />
-      <ellipse cx="165" cy="79.5" rx="9" ry="3.6" fill="#C98B4A" />
-      <path d="M173 79.5l5-3.5v7z" fill="#C98B4A" />
-      <path d="M162 78l2 3M165 77.5l2 3.5" stroke="#9C5E2E" strokeWidth=".7" />
-      <circle cx="158.5" cy="78.6" r=".8" fill={DARK} />
-      <circle cx="178" cy="83" r="2" fill="#A7C46A" />
-      <ellipse cx="200" cy="82" rx="15" ry="4.5" fill={WHITE} stroke={LINEN} strokeWidth=".8" />
-      {[[195, -20], [205, 20]].map(([x, a]) => (
-        <g key={x} transform={`rotate(${a} ${x} 79)`}>
-          <ellipse cx={x} cy="79" rx="5" ry="3.6" fill="#9C4E2E" />
-          <path d={`M${x} 76v-6`} stroke={WHITE} strokeWidth="1.6" strokeLinecap="round" />
-          <circle cx={x - 1} cy="69.5" r="1.2" fill={WHITE} /><circle cx={x + 1} cy="69.5" r="1.2" fill={WHITE} />
-        </g>
-      ))}
-      <Bowl x={232} y={80} fill="var(--sage)" />
-      <path d="M228 79q4-4 8 0" stroke="#A7C46A" strokeWidth="1.2" />
-    </g>
-  )],
-  ["Laughter", (
-    <g>
-      <Bust x={164} kind="woman" top={WINE} cls="f0" />
-      <Bust x={236} kind="man" top="var(--sage)" cls="f1" />
-      <Bust x={187} kind="bride" top={YELLOW} cls="f1" />
-      <Bust x={213} kind="groom" top={WHITE} cls="f0" />
-      <text x="146" y="42" fill="var(--rose)" fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize="10">ha ha</text>
-      <text x="230" y="40" fill="var(--rose)" fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize="10">ha ha</text>
-    </g>
-  )],
-];
+// The photographer in the foreground, seen from behind as he shoots the group, reacting to
+// each beat of the scene. Drawn with his feet at (0, 0) and placed by Photobomb.
+// Poses: [camera offset, left arm [elbow, hand], right arm [elbow, hand] or null to wave]
+const SHOTS = {
+  aim: [[0, 0], [[-8.5, -26], [-6.6, -30]], [[8.5, -26], [6.6, -30]]],
+  low: [[0, 13], [[-6, -19.5], [-6.6, -17]], [[6, -19.5], [6.6, -17]]],
+  toss: [[0, 0], [[-7, -30], [-7.5, -35]], [[7, -30], [7.5, -35]]],
+  ears: [[0, 13], [[-8.5, -25], [-5, -28.5]], [[8.5, -25], [5, -28.5]]],
+  wave: [[0, 13], [[-6, -19.5], [-6.6, -17]], null],
+};
+// Pose per scene beat: aim, peek round the camera, juggle it in shock, cover ears from the
+// trumpet, wave everyone in, take the shot, then check the photo
+const SHOT_BY_BEAT = ["aim", "low", "toss", "ears", "wave", "aim", "low"];
 
-function DreamingCouple() {
-  const [i, setI] = useState(0);
+function Photographer({ p }) {
+  const [[cx, cy], left, right] = SHOTS[SHOT_BY_BEAT[p]];
+  const arm = ([[ex, ey], [hx, hy]], x) => (
+    <>
+      <path d={`M${x} -22L${ex} ${ey}L${hx} ${hy}`} stroke={SKIN} strokeWidth="2.4" strokeLinecap="round"
+        strokeLinejoin="round" />
+      <circle cx={hx} cy={hy} r="1.5" fill={SKIN} />
+    </>
+  );
+  return (
+    <g transform="translate(120 128) scale(1.15)">
+      <g className="ph">
+        <ellipse cy="0.5" rx="10" ry="1.8" fill="var(--rose-soft)" />
+        <path d="M-2 -9v9M2 -9v9" stroke={DARK} strokeWidth="2.8" strokeLinecap="round" />
+        <g style={{ transform: `translate(${cx}px, ${cy}px)` }}>
+          <g className="cam">
+            <rect x="-7" y="-33" width="14" height="6.5" rx="1.2" fill={DARK} />
+            <rect x="-2" y="-37.5" width="4" height="4.5" rx=".6" fill={DARK} />
+            <path className="burst" d="M0 -39v-3M-2.2 -38.6l-2-2M2.2 -38.6l2-2" stroke={GOLD} strokeWidth=".8"
+              strokeLinecap="round" />
+          </g>
+        </g>
+        <rect x="-4.5" y="-24" width="9" height="16" rx="2" fill="#55606E" />
+        <path d="M-3.6 -23L3.4 -12" stroke={DARK} strokeWidth=".7" />
+        <g className="ph-head">
+          <circle cx="-4.5" cy="-28.5" r="1.1" fill={SKIN} />
+          <circle cx="4.5" cy="-28.5" r="1.1" fill={SKIN} />
+          <circle cy="-29" r="4.5" fill={HAIR} />
+          <g className="ph-cap">
+            <path d="M-4.6 -30a4.6 4.6 0 0 1 9.2 0z" fill="var(--rose)" />
+            <path d="M-4.9 -30.2q4.9 3.6 9.8 0z" fill={WINE} />
+          </g>
+        </g>
+        {arm(left, -4)}
+        {right ? arm(right, 4) : <g className="ph-wave">{arm([[7.5, -28], [9, -35]], 4)}</g>}
+      </g>
+    </g>
+  );
+}
+
+const HEART = "M0 3s-4-2.6-4-5.2a2.2 2.2 0 0 1 4-1.2 2.2 2.2 0 0 1 4 1.2c0 2.6-4 5.2-4 5.2z";
+
+function Photobomb() {
+  const [p, setP] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setI((n) => (n + 1) % DREAMS.length), 3400);
-    return () => clearInterval(t);
-  }, []);
+    const t = setTimeout(() => setP((n) => (n + 1) % SCENE.length), SCENE[p][1]);
+    return () => clearTimeout(t);
+  }, [p]);
+
+  const [caption, , move, cousin, trumpeter, aunty] = SCENE[p];
+  const prev = SCENE[(p + SCENE.length - 1) % SCENE.length];
+  const walks = (i) => move > 0 && SCENE[p][i] !== prev[i];
+  const toot = p === 3 || p === 4;
+  const bunny = p === 2 || p === 4 || p === 5;
+  const ears = p === 3 && [[-2, -6], [2, -6]];
 
   return (
-    <svg className="dreaming" viewBox="34 -66 332 482" fill="none" aria-hidden="true">
-      <ellipse cx="200" cy="404" rx="140" ry="8" fill="var(--rose-soft)" />
+    <svg className={"photo p" + p} viewBox="52 32 136 108" fill="none" aria-hidden="true"
+      style={{ "--move": move + "ms" }}>
+      <ellipse cx="120" cy="89" rx="62" ry="3" fill="var(--rose-soft)" />
+      <path className="finder" d="M92 48v-8h8M148 48v-8h-8M92 86v8h8M148 86v8h-8" stroke={GOLD} strokeLinecap="round" />
 
-      <g className="bubble">
-        <g transform="translate(200 18) scale(1.6) translate(-200 -64)">
-          <path d="M150 100c-22 0-30-20-16-30-10-20 12-36 30-28 6-20 36-26 50-10 16-14 44-4 40 16 20 4 22 32 4 40 4 16-22 24-34 12-10 12-38 12-46 2-10 8-30 6-28-2z"
-            fill="var(--paper)" stroke={GOLD} strokeWidth="1.2" />
-          {DREAMS.map(([label, art], k) => (
-            <g key={label} className={"dream" + (k === i ? " on" : "")}>
-              {art}
-              <text x="200" y="99" textAnchor="middle" fill="var(--rose)" fontFamily="DM Sans, sans-serif"
-                fontSize="7.5" fontWeight="500" letterSpacing="1.8">{label.toUpperCase()}</text>
-            </g>
-          ))}
-        </g>
-        <g fill="var(--paper)" stroke={GOLD} strokeWidth="1">
-          <circle className="td d1" cx="122" cy="88" r="5" /><circle className="td d2" cx="118" cy="100" r="3.6" />
-          <circle className="td d3" cx="116" cy="110" r="2.4" />
-          <circle className="td d1" cx="286" cy="84" r="5" /><circle className="td d2" cx="294" cy="94" r="3.6" />
-          <circle className="td d3" cx="300" cy="103" r="2.4" />
-        </g>
-      </g>
+      {/* Cousins, behind the couple */}
+      <Actor cls="cousin" dx={cousin} walk={walks(3)}>
+        <Mini x={100} kind="man" top={ORANGE} arms={ears || (bunny ? [[-5, -11], [9, -13]] : "down")} />
+        {bunny && <Fingers x={113} />}
+      </Actor>
+      <Actor cls="cousin c-r" dx={-cousin} walk={walks(3)}>
+        <Mini x={140} kind="woman" top={WINE} skirt="var(--rose)" arms={ears || (bunny ? [[-9, -13], [5, -11]] : "down")} />
+        {bunny && <Fingers x={127} />}
+      </Actor>
 
-      <g className="lean">
-        <Bride>
-          <path d="M150 182 160 210 139 163" stroke={SKIN} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M156.5 202l-2.5-5.5" stroke={GOLD} strokeWidth="10" />
-        </Bride>
-        <circle cx="124" cy="161" r="5.5" fill={SKIN} />
-      </g>
-      <g className="lean lean-r">
-        <Groom>
-          <Sleeve d="M250 180 240 210 261 163" />
-        </Groom>
-        <circle cx="276" cy="161" r="5.5" fill={SKIN} />
-      </g>
+      <Mini x={113} kind="bride" arms={ears ? [[-2, -6], [3, 7]] : [[-2, 11], [3, 7]]} />
+      <Mini x={127} kind="groom" arms={ears ? [[-3, 7], [2, -6]] : [[-3, 7], [2, 11]]} />
+
+      {/* An uncle playing the trumpet */}
+      <Actor cls="trumpeter" dx={trumpeter} walk={walks(4)}>
+        <Mini x={80} kind="man" top={RED} arms={[[10, -6], [6, -7]]} />
+        <g fill={GOLD}>
+          <path d="M83 59.5l11-4" stroke={GOLD} strokeWidth="1.4" strokeLinecap="round" />
+          <path d="M93 56l5-4.5 1.6 6.4z" />
+          <rect x="87" y="55.2" width="1.2" height="2.6" transform="rotate(-20 87 56)" />
+          <rect x="89.5" y="54.3" width="1.2" height="2.6" transform="rotate(-20 89.5 55)" />
+        </g>
+      </Actor>
+      {toot && <><Note x={101} y={51} cls="n1" /><Note x={105} y={48} cls="n2" /><Note x={98} y={46} cls="n3" /></>}
+
+      {/* An aunty bringing a sulking kid by the ear */}
+      <Actor cls="aunty" dx={aunty} walk={walks(5)}>
+        <g className="kid">
+          <g transform="translate(150 88) scale(.7) translate(-150 -88)">
+            <Mini x={150} kind="man" top={BLUE} arms={[[-1, 9], [1, 9]]} />
+          </g>
+        </g>
+        <Mini x={164} kind="woman" top="var(--sage)" skirt={YELLOW} arms={[[-6.5, 2.5], [4, 6]]} />
+      </Actor>
+
+      {p === 2 && <><Say x={89} y={47} anchor="end">hee hee</Say><Say x={151} y={47} anchor="start">hee hee</Say></>}
+      {p === 4 && <Say x={152} y={63} size={5.5} cls="late">ow!</Say>}
+      {p === 5 && <rect className="flash" x="92" y="40" width="56" height="54" rx="2" fill="#FFFFFF" />}
+
+      <Photographer p={p} />
+      {p === 0 && <Say x={133} y={99} anchor="start" size={5.5} cls="late">click</Say>}
+      {p === 1 && <Say x={133} y={99} anchor="start">?</Say>}
+      {p === 2 && <Say x={133} y={99} anchor="start">!?</Say>}
+      {p === 5 && <Say x={133} y={99} anchor="start" size={5.5}>click!</Say>}
+      {p === 6 && <path className="say" transform="translate(136 95) scale(.9)" fill="var(--rose)" d={HEART} />}
+
+      <text key={caption} className="caption" x="120" y="137" textAnchor="middle" fill="var(--rose)"
+        fontFamily="DM Sans, sans-serif" fontSize="5.4" fontWeight="500" letterSpacing="1.2">{caption.toUpperCase()}</text>
     </svg>
   );
 }
@@ -821,32 +857,359 @@ function Welcome() {
     <section className="page welcome">
       <PageBg motif="lotus" />
       <h2>{C.welcomeTitle}</h2>
-      <p className="sub">A note from us</p>
+      {/* <p className="sub">A note from us</p> */}
       <p className="body">{C.welcomeText}</p>
       <Countdown />
     </section>
   );
 }
 
+// The road from the bride's home in Haflong to the groom's in Maibang: the couple's car leads,
+// the family's bus follows, and the hill train runs through its tunnels behind them
+const ROAD = "M4 71H24C40 71 48 83 72 82S110 66 134 71S166 66 178 66";
+const JOURNEY_S = 11;
+// [keyPoints, keyTimes] along the road (wait at the start, drive, wait at the end), and the
+// [opacity, keyTime] frames that fade each vehicle in and out; the bus stays hidden behind the
+// bride's home until it pulls away
+const SHOWN = [[0, 0], [1, 0.05], [1, 0.9], [0, 0.96], [0, 1]];
+const DRIVES = {
+  car: ["0.17;0.17;0.95;0.95", "0;0.1;0.6;1", SHOWN],
+  bus: ["0;0;0.74;0.74", "0;0.17;0.68;1", [[0, 0], [0, 0.16], [1, 0.21], [1, 0.9], [0, 0.96], [0, 1]]],
+};
+const EASE = "0 0 1 1;.45 0 .55 1;0 0 1 1";
+
+// Animates an attribute on the journey's shared clock: [value, keyTime] pairs, eased like the
+// drives when `eased`
+const Clock = ({ attr, frames, type, eased }) => {
+  const props = {
+    attributeName: attr, dur: JOURNEY_S + "s", repeatCount: "indefinite",
+    values: frames.map((f) => f[0]).join(";"), keyTimes: frames.map((f) => f[1]).join(";"),
+    ...(eased && { calcMode: "spline", keySplines: EASE }),
+  };
+  return type ? <animateTransform {...props} type={type} /> : <animate {...props} />;
+};
+function Drive({ who, still, children }) {
+  const [points, times, shown] = DRIVES[who];
+  return (
+    <g>
+      {!still && <Clock attr="opacity" frames={shown} />}
+      {children}
+      <animateMotion dur={JOURNEY_S + "s"} repeatCount="indefinite" rotate="auto"
+        {...(still ? { keyPoints: "0.95;0.95", keyTimes: "0;1", calcMode: "linear" }
+          : { keyPoints: points, keyTimes: times, calcMode: "spline", keySplines: EASE })}>
+        <mpath xlinkHref="#road" />
+      </animateMotion>
+    </g>
+  );
+}
+
+// Wheels turn only while their vehicle is moving: `spin` is [start, end] keyTimes of its drive
+const Wheel = ({ x, spin, still }) => (
+  <g transform={`translate(${x} -3.2)`}>
+    <g>
+      {!still && <Clock attr="transform" type="rotate" eased
+        frames={[[0, 0], [0, spin[0]], [3600, spin[1]], [3600, 1]]} />}
+      <circle r="2.3" fill={DARK} />
+      <path d="M-1.5 0h3M0 -1.5v3" stroke={LINEN} strokeWidth=".5" />
+      <circle r=".8" fill={GOLD} />
+    </g>
+  </g>
+);
+
+// The wedding car, facing right with its wheels on the road
+function Car({ still }) {
+  return (
+    <g>
+      <path d="M-11 -5l-3.5 3M-11 -4.5l-5 1" stroke={LINEN} strokeWidth=".4" />
+      <rect x="-15.6" y="-3.4" width="1.8" height="2.2" rx=".3" fill={GOLD} />
+      <rect x="-17.4" y="-4.2" width="1.8" height="2.2" rx=".3" fill={LINEN} />
+      <path d="M-6 -9L-4 -13.5H3.5L6.5 -9z" fill={WHITE} stroke={LINEN} strokeWidth=".5" />
+      <path d="M-4.8 -9.4L-3.4 -12.8H-.6V-9.4zM.4 -9.4V-12.8H3.1L5.4 -9.4z" fill="#CFE0EA" />
+      <circle cx="-2.2" cy="-10.4" r="1.3" fill={SKIN} />
+      <path d="M-3.6 -10.5a1.4 1.4 0 0 1 2.8 0" stroke={VEIL} strokeWidth="1" />
+      <circle cx="1.9" cy="-10.4" r="1.3" fill={SKIN} />
+      <path d="M.5 -10.9a1.4 1.4 0 0 1 2.8 0z" fill={WHITE} />
+      <rect x="-11" y="-9" width="22" height="5.6" rx="2" fill={WHITE} stroke={LINEN} strokeWidth=".5" />
+      {[-9, -6.8, -4.6, -2.4, -.2, 2, 4.2, 6.4, 8.6].map((x, i) => (
+        <circle key={x} cx={x} cy="-8.3" r=".75" fill={MARIGOLD[i % 3]} />
+      ))}
+      <path fill="var(--rose)" transform="translate(-1 -6.4) scale(.32)" d={HEART} />
+      <circle cx="10.4" cy="-6.6" r=".8" fill={YELLOW} />
+      <circle cx="9" cy="-9.6" r="1.3" fill="var(--rose)" />
+      <circle cx="9" cy="-9.6" r=".5" fill={YELLOW} />
+      <Wheel x={-6.5} spin={[0.1, 0.6]} still={still} /><Wheel x={6.5} spin={[0.1, 0.6]} still={still} />
+    </g>
+  );
+}
+
+// The family's bus, with hands waving out of the windows and a honk on the way
+function Bus({ still }) {
+  const windows = [-12, -6.5, -1, 4.5];
+  return (
+    <g>
+      <rect x="-9" y="-16.5" width="12" height="3" rx=".8" fill={ORANGE} />
+      <path d="M-8 -15h10" stroke={WINE} strokeWidth=".4" />
+      {[-9.8, 2.6].map((x) => (
+        <path key={x} className={"wave-hand" + (x > 0 ? " w2" : "")} d={`M${x} -12l-.6-4.6`} stroke={SKIN}
+          strokeWidth="1" strokeLinecap="round" />
+      ))}
+      <rect x="-15" y="-13" width="30" height="9.5" rx="2" fill={YELLOW} />
+      <rect x="-15" y="-6.6" width="30" height="1.2" fill={RED} />
+      {windows.map((x) => <rect key={x} x={x} y="-11.8" width="4.5" height="3.6" rx=".6" fill="#CFE0EA" />)}
+      {windows.map((x) => (
+        <g key={x}>
+          <circle cx={x + 2.25} cy="-9.3" r="1.15" fill={SKIN} />
+          <path d={`M${x + 1.05} -9.6a1.2 1.2 0 0 1 2.4 0z`} fill={HAIR} />
+        </g>
+      ))}
+      <path d="M10.5 -11.8h2.6l1.4 3.4v.6h-4z" fill="#CFE0EA" />
+      <circle cx="14.6" cy="-5" r=".8" fill={WHITE} />
+      <Wheel x={-9} spin={[0.17, 0.68]} still={still} /><Wheel x={9} spin={[0.17, 0.68]} still={still} />
+      {!still && (
+        <text x="2" y="-19.5" textAnchor="middle" fill="var(--rose)" fontFamily="Cormorant Garamond, serif"
+          fontStyle="italic" fontSize="5" opacity="0">
+          beep beep!
+          <Clock attr="opacity" frames={[[0, 0], [0, 0.3], [1, 0.33], [1, 0.46], [0, 0.49], [0, 1]]} />
+        </text>
+      )}
+    </g>
+  );
+}
+
+// A home with a sloped roof, a marigold string and a map pin, labelled with its place and day
+function Home({ x, y, place, day }) {
+  return (
+    <g>
+      <path d={`M${x - 10} ${y - 9}L${x} ${y - 17}L${x + 10} ${y - 9}z`} fill={WINE} />
+      <rect x={x - 8} y={y - 9.5} width="16" height="9.5" fill="#F3E6D0" stroke={LINEN} strokeWidth=".5" />
+      <rect x={x - 2} y={y - 6} width="4" height="6" rx="1.6" fill={GOLD} />
+      <rect x={x - 6.5} y={y - 7} width="3" height="3" fill="#CFE0EA" />
+      <rect x={x + 3.5} y={y - 7} width="3" height="3" fill="#CFE0EA" />
+      <path d={`M${x - 8} ${y - 9}q8 3.5 16 0`} stroke={ORANGE} strokeWidth=".6" />
+      {[-5, -1.6, 1.6, 5].map((dx, i) => <circle key={dx} cx={x + dx} cy={y - 8 + (i % 3 ? 0.9 : 0)} r=".8" fill={MARIGOLD[i % 3]} />)}
+      <g transform={`translate(${x} ${y - 19})`}>
+        <path d="M0 0c-2.5-3-4-5-4-7a4 4 0 0 1 8 0c0 2-1.5 4-4 7z" fill="var(--rose)" />
+        <circle cy="-7" r="1.5" fill="var(--paper)" />
+      </g>
+      <text x={x} y={y + 12} textAnchor="middle" fill="var(--ink)" fontFamily="DM Sans, sans-serif" fontSize="4.6"
+        fontWeight="500" letterSpacing=".8">{place.toUpperCase()}</text>
+      <text x={x} y={y + 17.5} textAnchor="middle" fill="var(--muted)" fontFamily="DM Sans, sans-serif"
+        fontSize="3.8" letterSpacing=".5">{day}</text>
+    </g>
+  );
+}
+
+function Train() {
+  return (
+    <g className="train">
+      <g className="steam" fill="#FFFFFF" stroke={LINEN} strokeWidth=".3">
+        <circle className="s1" cx="49.5" cy="38" r="1.3" /><circle className="s2" cx="48" cy="36" r="1.7" />
+      </g>
+      {[24, 34].map((x, i) => (
+        <g key={x}>
+          <rect x={x} y="39.6" width="9" height="4.2" rx=".8" fill={i ? GOLD : "var(--sage)"} />
+          <path d={`M${x + 1.5} 41h2M${x + 5} 41h2`} stroke="#FFFFFF" strokeWidth="1.1" />
+        </g>
+      ))}
+      <rect x="44" y="39" width="8" height="4.8" rx="1" fill={WINE} />
+      <rect x="48.5" y="37.2" width="1.6" height="2.4" fill={WINE} />
+      <path d="M52 43.8l1.6-.4v-1.6" stroke={WINE} strokeWidth=".7" />
+    </g>
+  );
+}
+
+function Journey() {
+  const [still] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [first, second] = EVENTS;
+  const day = (e) => fmt(e.date, { day: "numeric", month: "short" });
+  return (
+    <svg className="journey" viewBox="0 0 200 92" fill="none" aria-hidden="true">
+      <defs>
+        <path id="road" d={ROAD} />
+        <clipPath id="tunnels"><rect x="57" y="20" width="86" height="30" /></clipPath>
+        {/* The landscape fades out at the sides and bottom instead of ending in a hard edge */}
+        <linearGradient id="fade-x"><stop offset="0" stopColor="#000" /><stop offset=".1" stopColor="#fff" />
+          <stop offset=".9" stopColor="#fff" /><stop offset="1" stopColor="#000" /></linearGradient>
+        <linearGradient id="fade-y" x2="0" y2="1"><stop offset=".72" stopColor="#fff" /><stop offset="1" stopColor="#000" /></linearGradient>
+        <mask id="land-x"><rect width="200" height="92" fill="url(#fade-x)" /></mask>
+        <mask id="land-y"><rect width="200" height="92" fill="url(#fade-y)" /></mask>
+      </defs>
+      <circle cx="160" cy="26" r="9" fill={GOLD} fillOpacity=".16" />
+
+      <g mask="url(#land-x)"><g mask="url(#land-y)">
+
+      {/* The hill railway: out of one tunnel, over the viaduct and into the next */}
+      <path d="M0 58C16 42 32 34 48 38S56 44 62 50 80 62 100 62 132 54 140 48 152 36 166 36 190 46 200 52V92H0z"
+        fill="var(--sage)" fillOpacity=".16" />
+      <g stroke={GOLD} strokeOpacity=".55" strokeWidth=".7">
+        <path d="M54 44H146" strokeWidth=".9" />
+        {[62, 76, 90, 104, 118].map((x) => <path key={x} d={`M${x} 72V50a7 6 0 0 1 14 0V72`} />)}
+      </g>
+      <g clipPath="url(#tunnels)"><Train /></g>
+      <path d="M53 44.4v-3.4a4 4 0 0 1 8 0v3.4zM139 44.4v-3.4a4 4 0 0 1 8 0v3.4z" fill={DARK} fillOpacity=".55" />
+
+      <path d="M0 68C30 58 62 62 92 70S152 60 200 62V92H0z" fill="var(--rose-soft)" fillOpacity=".7" />
+      {[[34, 66], [41, 65], [112, 66], [150, 61], [158, 62]].map(([x, y]) => (
+        <path key={x} d={`M${x} ${y}l3-8 3 8z`} fill="var(--sage)" fillOpacity=".6" />
+      ))}
+
+      {/* The road between the two homes */}
+      <path d={"M0 71L" + ROAD.slice(1) + "L200 66V92H0z"} fill="var(--sage)" fillOpacity=".22" />
+      <path d={ROAD} stroke="#E3D6C1" strokeWidth="3.2" strokeLinecap="round" />
+      <path d={ROAD} stroke="#FFFFFF" strokeWidth=".5" strokeDasharray="2 2.4" />
+      </g></g>
+      {/* The bus pulls out from behind the bride's home; both park in front of the groom's */}
+      <Home x={186} y={66} place={second.place} day={day(second)} />
+      <Drive who="bus" still={still}><Bus still={still} /></Drive>
+      <Home x={16} y={71} place={first.place} day={day(first)} />
+      <Drive who="car" still={still}><Car still={still} /></Drive>
+
+      {/* Hearts float up from the groom's home when everyone arrives */}
+      {!still && [[180, 44, 0], [186, 40, 0.03], [192, 45, 0.06]].map(([x, y, d]) => (
+        <g key={x} transform={`translate(${x} ${y})`}>
+          <g opacity="0">
+            <Clock attr="opacity" frames={[[0, 0], [0, 0.6 + d], [1, 0.64 + d], [0, 0.84 + d], [0, 1]]} />
+            <Clock attr="transform" type="translate" frames={[["0 0", 0], ["0 0", 0.6 + d], ["0 -12", 0.84 + d], ["0 -12", 1]]} />
+            <path fill="var(--rose)" transform="scale(.6)" d={HEART} />
+          </g>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+// The bride (first venue) or groom (second) puzzling over a paper map beside the Maps button.
+// Drawn at 1.3x around her or his feet; the map's panels, hills, river and route are in front
+// of the body, with the hands on its edges.
+function MapReader({ who }) {
+  const bride = who === "bride";
+  return (
+    <svg className={"mapper " + who} viewBox="0 0 50 64" fill="none" aria-hidden="true">
+      <g transform="translate(25 62) scale(1.3) translate(-25 -62)">
+        <g className="mapper-fig">
+          <g className="mapper-head">
+            <Mini x={25} y={62} kind={who} arms={[[-5, 3], [5, 3]]} />
+          </g>
+          <g className="paper">
+            {[[16, "#F3E6D0"], [22, "#E8D8BC"], [28, "#F3E6D0"]].map(([x, fill]) => (
+              <rect key={x} x={x} y="37" width="6" height="11" fill={fill} stroke={LINEN} strokeWidth=".3" />
+            ))}
+            <path d="M16 46c3-3 5-3 8-1s5 0 10-4v7H16z" fill="var(--sage)" fillOpacity=".5" />
+            <path d="M19 37c1 3-2 5 0 8" stroke="#8FB3C9" strokeWidth=".8" />
+            <path d="M18 44c4-1 6-5 9-4s3-1 5-1" stroke={RED} strokeWidth=".5" strokeDasharray="1 .8" />
+            <g className="paper-pin">
+              <path d="M32 39.5c-.9-1-1.4-1.7-1.4-2.4a1.4 1.4 0 0 1 2.8 0c0 .7-.5 1.4-1.4 2.4z" fill={RED} />
+            </g>
+          </g>
+          <circle cx="16" cy="42" r="1.3" fill={SKIN} />
+          <circle cx="34" cy="42" r="1.3" fill={SKIN} />
+        </g>
+      </g>
+      {(bride ? [["?", "q"], ["!", "a"]] : [["hmm…", "q"], ["aha!", "a"]]).map(([t, k]) => (
+        <text key={k} className={"mapper-say " + k} x={bride ? 9 : 42} y="24" textAnchor="middle" fill="var(--rose)"
+          fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize={t.length > 1 ? 8 : 11}>{t}</text>
+      ))}
+    </svg>
+  );
+}
+
 function Venue() {
   return (
     <section className="page">
-      <PageBg motif="hills" />
+      <PageBg motif="clouds" />
       <h2>The venues</h2>
       <p className="sub">Where to find us</p>
       <div className="venues">
-        {EVENTS.map((e) => (
-          <div key={e.place}>
-            <p className="venue-name">{e.place}</p>
-            <p className="addr">
-              {e.host} · {fmt(e.date, { weekday: "long", day: "numeric", month: "long" })}
-              {e.address && <><br />{e.address}</>}
-            </p>
-            <a className="btn" href={e.mapUrl} target="_blank" rel="noopener noreferrer">Open in Maps</a>
-          </div>
+        {EVENTS.map((e, i) => (
+          <Fragment key={e.place}>
+            {i > 0 && <Journey />}
+            <div className="venue">
+              <p className="venue-name">{e.place}</p>
+              <p className="addr">
+                {e.host} · {fmt(e.date, { weekday: "long", day: "numeric", month: "long" })}
+                {e.address && <><br />{e.address}</>}
+              </p>
+              <a className="btn" href={e.mapUrl} target="_blank" rel="noopener noreferrer">Open in Maps</a>
+              <MapReader who={i ? "groom" : "bride"} />
+            </div>
+          </Fragment>
         ))}
       </div>
     </section>
+  );
+}
+
+// Curtain call on the closing page: the family from the earlier scenes lines up to wave
+// goodbye while the couple let a sky lantern go, which rises up the page. Feet at y = 70.
+const GREY = "#B8AEA4";
+
+// A guest waving one arm (`side` l or r) from the shoulder; `arm` is the other arm
+function Waver({ x, side, arm = [2, 11], ...look }) {
+  const l = side === "l";
+  return (
+    <g>
+      <Mini x={x} y={70} {...look} arms={l ? [[0, 0], arm] : [arm, [0, 0]]} />
+      <g className={"wave-arm " + side}>
+        <path d={`M${x + (l ? -4 : 4)} 47l${l ? -5 : 5} -11`} stroke={SKIN} strokeWidth="2.4" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+function Farewell() {
+  return (
+    <svg className="farewell" viewBox="0 18 200 56" fill="none" aria-hidden="true">
+      <ellipse cx="100" cy="70.5" rx="88" ry="2.6" fill="var(--rose-soft)" />
+
+      {/* Grandma and grandpa (with his cane), waving */}
+      <Waver x={26} side="r" kind="woman" top="var(--rose)" skirt={DARK} hair={GREY} />
+      <Waver x={42} side="r" arm={[-3, 10]} kind="man" top={GOLD} hair={GREY} />
+      <path d="M35 56l-1 14" stroke="#8B5A3C" strokeWidth="1.3" strokeLinecap="round" />
+
+      {/* The uncle playing up to the sky */}
+      <Mini x={58} y={70} kind="man" top={RED} arms={[[9, -7], [4, -10]]} />
+      <path d="M61 41l9-9" stroke={GOLD} strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M69 31.5l4.5-4.5 1.5 4.6z" fill={GOLD} />
+      <Note x={75} y={27} cls="n1" /><Note x={79} y={24} cls="n2" /><Note x={72} y={22} cls="n3" />
+
+      {/* The kid, hopping with both arms up */}
+      <g className="kid-hop">
+        <g transform="translate(74 70) scale(.7) translate(-74 -70)">
+          <Mini x={74} y={70} kind="man" top={BLUE} arms="up" />
+        </g>
+      </g>
+
+      {/* The couple, letting a sky lantern go */}
+      <g className="cheer">
+        <Mini x={92} y={70} kind="bride" arms={[[-2, 11], [3, -12]]} />
+        <Mini x={108} y={70} kind="groom" arms={[[-3, -12], [2, 11]]} />
+      </g>
+      <g className="sky-lantern">
+        <g className="sky-sway">
+          <path d="M95 24q5-4 10 0l-1.5 10h-7z" fill="#E9B85A" />
+          <path d="M97 25q3-2 6 0l-.8 7.6h-4.4z" fill="#F6DFA0" />
+          <path d="M96.5 34h7" stroke={GOLD} strokeWidth=".8" />
+          <ellipse cx="100" cy="35.6" rx=".9" ry="1.4" fill="#E07B39" />
+        </g>
+      </g>
+
+      {/* The cousins: one waving, the other sneaking bunny ears behind her */}
+      <Mini x={142} y={70} kind="man" top={ORANGE} arms={[[-11, -13], [2, 11]]} />
+      <Fingers x={127} y={34} />
+      <Waver x={126} side="l" arm={[2, 11]} kind="woman" top={WINE} skirt="var(--rose)" />
+
+      {/* The photographer, facing us for one last shot */}
+      <Mini x={158} y={70} kind="man" top="#55606E" arms={[[-1, -6], [1, -6]]} />
+      <path d="M153.4 41a4.6 4.6 0 0 1 9.2 0c-2-3-7-3-9.2 0z" fill="var(--rose)" />
+      <rect x="153.5" y="38.5" width="9" height="6" rx="1.2" fill={DARK} />
+      <rect x="155" y="36.4" width="3" height="2.2" rx=".4" fill={DARK} />
+      <circle cx="158" cy="41.5" r="2" fill="#5B5F6B" />
+      <circle cx="158" cy="41.5" r="1" fill="#A9C2D6" />
+      <path className="snap" d="M156.5 35v-3M154.2 35.4l-2-2M158.8 35.4l2-2" stroke={GOLD} strokeWidth=".8" strokeLinecap="round" />
+
+      {/* The aunty, waving from the end of the line */}
+      <Waver x={174} side="l" arm={[4, 6]} kind="woman" top="var(--sage)" skirt={YELLOW} />
+    </svg>
   );
 }
 
@@ -867,6 +1230,7 @@ function Footer() {
       <p className="closing-date">{C.dateLabel}</p>
       <p className="closing-places">{EVENTS.map((e) => e.place).join(" · ")}</p>
       {C.closingNote && <p className="closing-note">{C.closingNote}</p>}
+      <Farewell />
     </footer>
   );
 }

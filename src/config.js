@@ -6,7 +6,7 @@ export const CONFIG = {
 
   welcomeTitle: "To the big day",
   welcomeText:
-    "We’re getting married, and it would mean the world to us to have you by our side as we begin this new chapter. Come celebrate with us and our families in Haflong and Maibang.",
+    "As we begin this beautiful new chapter of our lives together, it would mean the world to us to have you by our side. Come, be a part of our celebration as we embark on this journey of love, togetherness, and forever. Your presence and blessings would make our special moments even more meaningful.",
 
   dateLabel: "12 & 13 January 2027",
   countdownTo: "2027-01-12T00:00:00+05:30", // India time; set the ceremony hour if you know it

@@ -76,39 +76,47 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
   font-variant-numeric:lining-nums tabular-nums;
 }
 .countdown-row span{font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-left:.12em}
-.dreaming{display:block;width:min(68%,250px);height:auto;margin:6px auto 0;overflow:visible}
-.lean,.bubble,.td,.dream,.notes .n,.dancers,.steam path,.face,.hop,.sing{transform-box:fill-box}
-.lean{transform-origin:50% 100%;animation:lean 4s ease-in-out infinite alternate}
-.lean-r{animation-delay:-2s}
-@keyframes lean{from{transform:rotate(-1.5deg)}to{transform:rotate(1.5deg)}}
-.bubble{animation:bob 5s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-4px)}}
-.bubble > g:first-child > path{filter:drop-shadow(0 3px 6px rgba(58,38,48,.12))}
-.td{animation:td 2.4s ease-in-out infinite}
-.td.d2{animation-delay:.25s}
-.td.d3{animation-delay:.5s}
-@keyframes td{0%,100%{opacity:.45}50%{opacity:1}}
-.dream{opacity:0;transform:scale(.8);transform-origin:center;transition:opacity .6s ease, transform .6s ease}
-.dream.on{opacity:1;transform:none}
-.notes .n{opacity:0;animation:note 2.4s ease-out infinite}
-.notes .n2{animation-delay:.8s}
-.notes .n3{animation-delay:1.6s}
-@keyframes note{0%{opacity:0;transform:translateY(6px)}30%{opacity:1}100%{opacity:0;transform:translate(5px,-14px)}}
-.dancers{transform-origin:50% 100%;animation:twirl .9s ease-in-out infinite alternate}
-@keyframes twirl{from{transform:rotate(-7deg)}to{transform:rotate(7deg) translateY(-2px)}}
-.steam path{opacity:0;animation:steam 2.1s ease-in-out infinite}
-.steam .s2{animation-delay:.7s}
-.steam .s3{animation-delay:1.4s}
-@keyframes steam{0%{opacity:0;transform:translateY(4px)}50%{opacity:.85}100%{opacity:0;transform:translateY(-8px)}}
-.hop{transform-origin:50% 100%;animation:hop .5s ease-in-out infinite alternate}
-.hop.d2,.sing.d2{animation-delay:-.25s}
-@keyframes hop{to{transform:translateY(-3px)}}
-.sing{transform-origin:50% 100%;animation:singsway 1.4s ease-in-out infinite alternate}
-.sing.d2{animation-delay:-.7s}
-@keyframes singsway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
-.face{transform-origin:50% 100%;animation:giggle .45s ease-in-out infinite alternate}
-.face.f1{animation-delay:-.22s}
-@keyframes giggle{to{transform:translateY(-3px) rotate(5deg)}}
+.photo{display:block;width:100%;height:auto;margin:16px auto 0}
+.actor,.bob,.kid,.note,.say,.caption{transform-box:fill-box}
+.actor{transition:transform var(--move) ease-in-out}
+.walk .bob{animation:step .3s ease-in-out infinite alternate}
+.trumpeter.walk .bob,.aunty.walk .bob{animation-duration:.42s}
+@keyframes step{to{transform:translateY(-2px)}}
+.p2 .cousin .bob,.p3 .cousin .bob{transform-origin:50% 100%;animation:wiggle .35s ease-in-out infinite alternate}
+.c-r .bob{animation-delay:-.17s}
+@keyframes wiggle{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.kid{transform-origin:50% 100%;transition:transform .35s ease}
+.p4 .kid,.p6 .kid{transform:rotate(7deg)}
+.note{opacity:0;animation:note 1.8s ease-out infinite}
+.note.n2{animation-delay:.6s}
+.note.n3{animation-delay:1.2s}
+@keyframes note{0%{opacity:0;transform:translateY(4px)}30%{opacity:1}100%{opacity:0;transform:translate(6px,-12px)}}
+.ph,.ph-head,.ph-cap,.ph-wave,.cam,.burst{transform-box:fill-box}
+.ph{transform-origin:50% 100%;transition:transform .3s ease}
+.p5 .ph{transform:translateY(1.5px)}
+.p2 .ph{animation:ph-jump .9s ease-out .15s}
+@keyframes ph-jump{25%{transform:translateY(-5px)}50%{transform:none}75%{transform:translateY(-2.5px)}}
+.p2 .cam{transform-origin:center;animation:toss 1.1s ease-in-out .2s}
+@keyframes toss{35%{transform:translate(1px,-12px) rotate(-25deg)}70%{transform:translate(0,-2px) rotate(6deg)}}
+.ph-head{transform-origin:40% 100%;transition:transform .4s ease}
+.p1 .ph-head{transform:rotate(-14deg)}
+.p6 .ph-head{transform:translateY(1.2px)}
+.p3 .ph-cap{transform-origin:center;animation:cap 2s ease-in-out both}
+@keyframes cap{18%{transform:translate(-2px,-9px) rotate(-30deg)}35%{transform:translate(-2px,-7px) rotate(-12deg)}70%{transform:translate(-2px,-8px) rotate(-22deg)}100%{transform:none}}
+.ph-wave{transform-origin:0 100%;animation:ph-wave .45s ease-in-out infinite alternate}
+@keyframes ph-wave{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+.burst{opacity:0;transform-origin:50% 100%}
+.p0 .burst{animation:burst .5s ease-out .9s}
+.p5 .burst{animation:burst .6s ease-out}
+@keyframes burst{20%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+.say{transform-origin:50% 100%;animation:say .35s ease-out both}
+.say.late{animation-delay:.9s}
+@keyframes say{from{opacity:0;transform:translateY(3px) scale(.6)}}
+.caption{animation:say .4s ease-out both}
+.flash{opacity:0;animation:flash .7s ease-out}
+@keyframes flash{15%{opacity:.95}100%{opacity:0}}
+.p5 .finder{animation:glow .7s ease-out}
+@keyframes glow{20%{stroke:var(--rose);stroke-width:1.6}}
 .sprig{width:92px;height:auto;color:var(--sage);margin-bottom:22px}
 .sprig .bloom{color:var(--rose)}
 
@@ -146,7 +154,6 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 .petal:nth-child(odd) path{fill:#E3A9AE;opacity:.75}
 @keyframes fall{to{transform:translateY(calc(var(--screen-h,100svh) + 48px))}}
 @keyframes sway{from{transform:translateX(-14px) rotate(-30deg)}to{transform:translateX(14px) rotate(40deg)}}
-.hills{position:absolute;left:0;bottom:0;width:100%;opacity:.75}
 .cloud{position:absolute;left:0;width:110px;opacity:.45;animation:drift 80s linear infinite}
 .cloud.c1{top:9%;animation-delay:-25s}
 .cloud.c2{top:19%;width:72px;animation-duration:110s;animation-delay:-70s}
@@ -164,6 +171,7 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 .corner.tr{top:8px;right:8px;transform:scaleX(-1)}
 .corner.bl{bottom:8px;left:8px;transform:scaleY(-1)}
 .corner.br{bottom:8px;right:8px;transform:scale(-1)}
+.hero{padding-top:56px;padding-bottom:52px}
 .hero .lead{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:22px;color:var(--rose);margin:0 0 14px}
 .hero h1{font-size:clamp(54px,17cqi,78px);line-height:.98}
 .hero .amp{display:block;font-style:italic;font-size:.55em;color:var(--rose);margin:4px 0}
@@ -189,6 +197,13 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 .cal-btn svg{width:15px;height:15px;flex:none}
 .cal-btn:hover{transform:translateY(-1px);box-shadow:0 10px 18px -8px rgba(138,64,81,.7)}
 .cal-btn:focus-visible{outline:3px solid var(--sage);outline-offset:3px}
+.says{display:block;width:calc(100% + 16px);height:auto;margin:4px -8px 0;overflow:visible}
+.says-bubble,.says-fig{transform-box:fill-box}
+.says-bubble{transform-origin:50% 100%;animation:says 3.2s ease-in-out infinite}
+.says.groom .says-bubble,.says.groom .says-fig{animation-delay:-1.6s}
+@keyframes says{50%{transform:translateY(-2px) scale(1.03)}}
+.says-fig{transform-origin:50% 100%;animation:sd-hop 3.2s ease-in-out infinite}
+@keyframes sd-hop{0%,60%,80%,100%{transform:none}70%{transform:translateY(-3px)}88%{transform:translateY(-1.5px)}}
 .hint{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px));left:0;right:0;color:var(--muted);font-size:14px}
 
 /* Buttons */
@@ -206,6 +221,44 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 .venue-name{font-family:"Cormorant Garamond",Georgia,serif;font-size:30px;margin:0 0 6px}
 .addr{color:var(--muted);margin:0 0 18px;max-width:30ch}
 .venues{display:grid;gap:40px}
+.venue{position:relative}
+.mapper{position:absolute;bottom:-4px;width:72px;height:auto;overflow:visible;pointer-events:none}
+.mapper.bride{left:-10px}
+.mapper.groom{right:-10px}
+.mapper-fig,.mapper-head,.paper,.paper-pin,.mapper-say{transform-box:fill-box}
+.mapper-fig{transform-origin:50% 100%}
+.mapper-head{transform-origin:50% 60%}
+.paper{transform-origin:50% 50%}
+.mapper-say{opacity:0;transform-origin:50% 100%}
+/* Bride: studies the map, turns it sideways, puzzled, then works it out and hops */
+.bride .paper{animation:map-turn 6s ease-in-out infinite}
+@keyframes map-turn{0%,22%{transform:none}30%,46%{transform:rotate(-24deg)}54%,100%{transform:none}}
+.bride .mapper-head{animation:puzzled 6s ease-in-out infinite}
+@keyframes puzzled{0%,24%{transform:none}32%,46%{transform:rotate(-6deg)}54%,100%{transform:none}}
+.bride .mapper-fig{animation:found 6s ease-out infinite}
+@keyframes found{0%,60%,74%,100%{transform:none}66%{transform:translateY(-4px)}70%{transform:translateY(-1.5px)}}
+.mapper-say.q{animation:map-q 6s ease-out infinite}
+.mapper-say.a{animation:map-a 6s ease-out infinite}
+@keyframes map-q{0%,28%{opacity:0;transform:scale(.6)}33%,46%{opacity:1;transform:none}50%,100%{opacity:0}}
+@keyframes map-a{0%,58%{opacity:0;transform:scale(.6)}63%,84%{opacity:1;transform:none}90%,100%{opacity:0}}
+/* Groom: reads, flips the map over, it flutters in the breeze, then aha and the pin bounces */
+.groom .mapper-say.q{animation-name:map-q2}
+@keyframes map-q2{0%,8%{opacity:0;transform:scale(.6)}13%,30%{opacity:1;transform:none}34%,100%{opacity:0}}
+.groom .paper{animation:map-flip 6s ease-in-out infinite}
+@keyframes map-flip{0%,30%{transform:none}38%,46%{transform:scaleX(-1)}54%{transform:none}57%{transform:skewY(6deg)}60%{transform:skewY(-5deg)}63%,100%{transform:none}}
+.groom .paper-pin{transform-origin:50% 100%;animation:pin-hop 6s ease-out infinite}
+@keyframes pin-hop{0%,62%,76%,100%{transform:none}67%{transform:translateY(-2.5px)}72%{transform:translateY(-1px)}}
+.groom .mapper-fig{animation:none}
+.journey{display:block;width:calc(100% + 32px);max-width:380px;height:auto;margin:-22px -16px -18px;justify-self:center}
+.train,.steam circle,.wave-hand{transform-box:fill-box}
+.train{animation:train 12s linear infinite}
+@keyframes train{70%,100%{transform:translateX(125px)}}
+.steam circle{opacity:0;animation:puff 1.4s ease-out infinite}
+.steam .s2{animation-delay:.7s}
+@keyframes puff{0%{opacity:0;transform:translate(0,0) scale(.5)}30%{opacity:.9}100%{opacity:0;transform:translate(-4px,-5px) scale(1.4)}}
+.wave-hand{transform-origin:50% 100%;animation:wave-hand .35s ease-in-out infinite alternate}
+.wave-hand.w2{animation-delay:-.17s}
+@keyframes wave-hand{from{transform:rotate(-25deg)}to{transform:rotate(25deg)}}
 
 /* Closing card */
 .closing{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
@@ -220,6 +273,28 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 .closing-date{font-size:12.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;padding-left:.22em}
 .closing-places{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:20px;color:var(--ink);margin:0}
 .closing-note{color:var(--muted);margin:26px 0 0;max-width:28ch}
+.farewell{display:block;width:calc(100% + 24px);max-width:400px;height:auto;margin:24px -12px 0;overflow:visible}
+.wave-arm,.kid-hop,.cheer,.sky-lantern,.sky-sway,.snap{transform-box:fill-box}
+.wave-arm{animation:wave-arm .5s ease-in-out infinite alternate}
+.wave-arm.r{transform-origin:0 100%}
+.wave-arm.l{transform-origin:100% 100%;animation-delay:-.25s}
+@keyframes wave-arm{from{transform:rotate(-16deg)}to{transform:rotate(16deg)}}
+.kid-hop{transform-origin:50% 100%;animation:kid-hop .42s ease-in-out infinite alternate}
+@keyframes kid-hop{to{transform:translateY(-3px)}}
+/* The lantern glows in their hands, is let go and rises up the page; a new one appears */
+.sky-lantern{filter:drop-shadow(0 0 4px rgba(233,184,90,.7));animation:sky-lantern 8s ease-in infinite}
+@keyframes sky-lantern{
+  0%{opacity:0;transform:none}
+  8%,30%{opacity:1;transform:none}
+  80%{opacity:.8}
+  100%{opacity:0;transform:translate(-14px,-250px) scale(.55)}
+}
+.sky-sway{animation:sky-sway 2.4s ease-in-out infinite alternate}
+@keyframes sky-sway{from{transform:translateX(-2px) rotate(-5deg)}to{transform:translateX(2px) rotate(5deg)}}
+.cheer{transform-origin:50% 100%;animation:cheer 8s ease-out infinite}
+@keyframes cheer{0%,30%,40%,100%{transform:none}34%{transform:translateY(-3px)}37%{transform:translateY(-1px)}}
+.snap{opacity:0;transform-origin:50% 100%;animation:snap 3.2s ease-out 1s infinite}
+@keyframes snap{0%,88%{opacity:0;transform:scale(.6)}92%{opacity:1;transform:none}100%{opacity:0;transform:scale(1.3)}}
 .lantern{
   position:absolute;bottom:-40px;left:var(--x);width:var(--s);
   filter:drop-shadow(0 0 6px rgba(233,184,90,.55));animation:rise var(--d) linear var(--delay) infinite;
@@ -241,7 +316,7 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 #intro.gone{opacity:0;visibility:hidden;pointer-events:none}
 .door{
   position:absolute;top:0;bottom:0;width:50%;overflow:hidden;backface-visibility:hidden;
-  transition:transform 1.25s cubic-bezier(.6,0,.3,1) .85s;
+  transition:transform 2s cubic-bezier(.7,0,.25,1) 2.7s;
 }
 .door.left{left:0;transform-origin:left center}
 .door.right{right:0;transform-origin:right center}
@@ -291,19 +366,56 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 @keyframes glint{0%{background-position:100% 0}40%,100%{background-position:0 0}}
 .couple{position:relative;display:block;width:min(94%,calc(var(--screen-h,100svh) * .6));height:auto}
 
-/* Untie: the bow pulls apart, then each half of the ribbon slides back into its holder's hand */
-.knot,.rb{transform-box:fill-box}
+/* Untie: the bow loosens and its loops slide apart, gold glints drift up, then each half of the
+   ribbon draws slowly back into its holder's hand before the doors swing open */
+.knot,.bow,.wrap,.rb,.glint{transform-box:fill-box}
 .knot{
   transform-origin:center;filter:drop-shadow(0 3px 3px rgba(58,38,48,.2));
   animation:nudge 2.6s ease-in-out infinite;
-  transition:transform .5s cubic-bezier(.5,0,.75,0), opacity .4s ease .1s;
 }
 @keyframes nudge{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.rb{transition:transform .6s cubic-bezier(.45,0,.6,1) .25s}
+.open .knot{animation-play-state:paused}
+.bow{transition:transform 1.4s cubic-bezier(.45,0,.2,1) .3s, opacity 1s ease .7s}
+.bow-l{transform-origin:right center}
+.bow-r{transform-origin:left center}
+.open .bow-l{transform:translate(-46px,6px) rotate(-16deg) scale(.5);opacity:0}
+.open .bow-r{transform:translate(46px,6px) rotate(16deg) scale(.5);opacity:0}
+.wrap{transform-origin:center;transition:transform .8s cubic-bezier(.4,0,.2,1) .2s, opacity .6s ease .45s}
+.open .wrap{transform:scale(.3,1.15);opacity:0}
+.rb{transition:transform 1.3s cubic-bezier(.65,0,.35,1) .8s}
 .rb-l{transform-origin:left center}
 .rb-r{transform-origin:right center}
-.open .knot{animation:none;transform:scale(1.7,.15);opacity:0}
 .open .rb{transform:scaleX(0)}
+/* Each holder gives the ribbon a little tug, holds it as it reels in, then brings the hand up
+   to rest at the waist with the elbow turned out; the loose end keeps hanging straight down */
+.open .hold{animation:2.9s cubic-bezier(.45,0,.35,1) .1s both}
+.open .arm-b{animation-name:arm-b}
+.open .fore-b{animation-name:fore-b}
+.open .tail-b{animation-name:tail-b}
+.open .arm-g{animation-name:arm-g}
+.open .fore-g{animation-name:fore-g}
+.open .tail-g{animation-name:tail-g}
+@keyframes arm-b{60%{transform:none}100%{transform:rotate(-10deg)}}
+@keyframes fore-b{12%{transform:rotate(5deg)}26%{transform:none}60%{transform:rotate(6deg)}100%{transform:rotate(80deg)}}
+@keyframes tail-b{12%{transform:rotate(-5deg)}26%{transform:none}60%{transform:rotate(-6deg)}100%{transform:rotate(-70deg)}}
+@keyframes arm-g{60%{transform:none}100%{transform:rotate(10deg)}}
+@keyframes fore-g{12%{transform:rotate(-5deg)}26%{transform:none}60%{transform:rotate(-6deg)}100%{transform:rotate(-80deg)}}
+@keyframes tail-g{12%{transform:rotate(5deg)}26%{transform:none}60%{transform:rotate(6deg)}100%{transform:rotate(70deg)}}
+.glint{opacity:0}
+.open .glint{animation:glint 1.6s cubic-bezier(.2,.6,.3,1) both}
+@keyframes glint{
+  0%{opacity:0;transform:translate(0,0) scale(.3)}
+  25%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1)}
+}
+/* A thread of warm light along the seam as the doors part */
+.seam{
+  position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;pointer-events:none;opacity:0;
+  background:linear-gradient(transparent,#F3DFA6 25%,#FFF6DE 50%,#F3DFA6 75%,transparent);
+  box-shadow:0 0 18px 6px rgba(243,223,166,.55);
+}
+.open .seam{animation:seam 2.4s ease 2.2s both}
+@keyframes seam{0%{opacity:0}35%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(24)}}
 
 .untie{
   position:absolute;inset:0;z-index:3;width:100%;background:transparent;border:0;padding:0;
@@ -317,7 +429,7 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
   font:500 15px/1 "DM Sans",system-ui,sans-serif;letter-spacing:.01em;
   color:var(--on-rose);background:var(--rose);border-radius:999px;pointer-events:none;
   box-shadow:0 6px 18px -6px rgba(138,64,81,.55);
-  transform:translateX(-50%);animation:float 2.4s ease-in-out infinite;transition:opacity .3s;
+  transform:translateX(-50%);animation:float 2.4s ease-in-out infinite;transition:opacity .6s;
 }
 .tap svg{width:18px;height:18px;flex:none}
 .tap::after{
@@ -331,6 +443,8 @@ h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif
 
 @media (prefers-reduced-motion: reduce){
   html,.screen{scroll-behavior:auto}
-  .knot,.tap,.tap::after,.shine,.mono p,.garland .str,.sparkle,.lean,.bubble,.td,.notes .n,.dancers,.steam path,.face,.hop,.sing,.lotus,.petal,.petal svg,.cloud,.lantern,.lantern svg{animation:none}
-  .door,.rb,.knot,#intro,.btn{transition-duration:.01s!important;transition-delay:0s!important}
+  .knot,.tap,.tap::after,.shine,.mono p,.garland .str,.sparkle,.bob,.note,.say,.caption,.flash,.finder,.lotus,.petal,.petal svg,.cloud,.lantern,.lantern svg,.glint,.seam,.wave-arm,.kid-hop,.sky-lantern,.sky-sway,.cheer,.snap,.mapper-fig,.mapper-head,.paper,.paper-pin,.train,.steam circle,.wave-hand,.ph,.ph-cap,.ph-wave,.cam,.burst,.says-bubble,.says-fig,.open .hold{animation:none}
+  .train{transform:translateX(60px)}
+  .mapper-say{animation:none!important;opacity:0}
+  .actor,.kid,.door,.rb,.bow,.wrap,#intro,.btn{transition-duration:.01s!important;transition-delay:0s!important}
 }
