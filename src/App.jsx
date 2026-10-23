@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useState } from "react";
+import { Fragment, useCallback, useEffect, useId, useRef, useState } from "react";
 import { CONFIG as C } from "./config.js";
 
 const enc = encodeURIComponent;
@@ -10,7 +10,8 @@ const fmt = (d, opts) => d.toLocaleDateString("en-GB", opts);
 const ymd = (d) => fmt(d, { year: "numeric" }) + String(d.getMonth() + 1).padStart(2, "0") +
   String(d.getDate()).padStart(2, "0");
 
-const EVENTS = C.events.map((e) => {
+// Adds map and calendar links; `what` names the occasion ("wedding", "reception")
+const withLinks = (e, what) => {
   const date = toDate(e.date);
   const next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
   const where = e.address || e.place;
@@ -20,11 +21,14 @@ const EVENTS = C.events.map((e) => {
     mapUrl: e.mapLink || "https://www.google.com/maps/search/?api=1&query=" + enc(where),
     calUrl:
       "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-      `&text=${enc(names + "’s wedding, " + e.place)}&dates=${ymd(date)}/${ymd(next)}` +
+      `&text=${enc(names + "’s " + what + ", " + e.place)}&dates=${ymd(date)}/${ymd(next)}` +
       `&location=${enc(where)}` +
-      `&details=${enc("Invitation to " + names + "’s wedding at the " + e.host.toLowerCase() + ".")}`,
+      `&details=${enc("Invitation to " + names + "’s " + what + " at the " + e.host.toLowerCase() + "." +
+        (e.time ? " " + e.time[0].toUpperCase() + e.time.slice(1) + "." : ""))}`,
   };
-});
+};
+const EVENTS = C.events.map((e) => withLinks(e, "wedding"));
+const RECEPTION = C.reception && withLinks(C.reception, "reception");
 
 function Sprig() {
   return (
@@ -525,6 +529,7 @@ function Lanterns() {
 const MOTIFS = {
   garland: () => <><Garland /><Sparkles /></>, lotus: () => <><Lotus /><Petals /></>,
   clouds: () => <><Cloud className="c1" /><Cloud className="c2" /></>,
+  sparkles: Sparkles,
   lanterns: Lanterns,
 };
 
@@ -1124,7 +1129,7 @@ function Venue() {
           <Fragment key={e.place}>
             {i > 0 && <Journey />}
             <div className="venue">
-              <p className="venue-name">{e.place}</p>
+              <p className="venue-name">{e.title || e.place}</p>
               <p className="addr">
                 {e.host} · {fmt(e.date, { weekday: "long", day: "numeric", month: "long" })}
                 {e.address && <><br />{e.address}</>}
@@ -1144,13 +1149,13 @@ function Venue() {
 const GREY = "#B8AEA4";
 
 // A guest waving one arm (`side` l or r) from the shoulder; `arm` is the other arm
-function Waver({ x, side, arm = [2, 11], ...look }) {
+function Waver({ x, y = 70, side, arm = [2, 11], ...look }) {
   const l = side === "l";
   return (
     <g>
-      <Mini x={x} y={70} {...look} arms={l ? [[0, 0], arm] : [arm, [0, 0]]} />
+      <Mini x={x} y={y} {...look} arms={l ? [[0, 0], arm] : [arm, [0, 0]]} />
       <g className={"wave-arm " + side}>
-        <path d={`M${x + (l ? -4 : 4)} 47l${l ? -5 : 5} -11`} stroke={SKIN} strokeWidth="2.4" strokeLinecap="round" />
+        <path d={`M${x + (l ? -4 : 4)} ${y - 23}l${l ? -5 : 5} -11`} stroke={SKIN} strokeWidth="2.4" strokeLinecap="round" />
       </g>
     </g>
   );
@@ -1213,6 +1218,123 @@ function Farewell() {
   );
 }
 
+// The groom's reception: the couple on a flower-ringed stage under fairy lights, a guest
+// climbing up with a gift, and the kid sneaking a laddoo from the buffet. Floor at y = 100,
+// stage at y = 86.
+const BULB_COLORS = [YELLOW, "var(--rose)", "#F6DFA0", ORANGE];
+// Bulbs along two swags of fairy lights: quadratic curves [start, control, end]
+const BULBS = [[[0, 4], [50, 22], [100, 6]], [[100, 6], [150, 22], [200, 4]]].flatMap(([a, c, b], k) =>
+  [0.1, 0.26, 0.42, 0.58, 0.74, 0.9].map((t) => [0, 1].map((i) =>
+    (1 - t) ** 2 * a[i] + 2 * (1 - t) * t * c[i] + t * t * b[i]).concat(k)));
+const RING = [-180, -150, -120, -90, -60, -30, 0, 25, 155];
+
+const Gift = ({ x, y, w = 7, h = 6, fill = "var(--rose)", cls }) => (
+  <g className={cls}>
+    <rect x={x} y={y} width={w} height={h} rx=".6" fill={fill} />
+    <path d={`M${x + w / 2} ${y}v${h}M${x} ${y + h / 2}h${w}`} stroke={GOLD} strokeWidth=".8" />
+    <path d={`M${x + w / 2} ${y}c-2-2.4-3.6-.6-1.6.4M${x + w / 2} ${y}c2-2.4 3.6-.6 1.6.4`} stroke={GOLD} strokeWidth=".7" />
+  </g>
+);
+
+function ReceptionScene() {
+  return (
+    <svg className="party" viewBox="0 0 200 106" fill="none" aria-hidden="true">
+      <ellipse cx="100" cy="100.6" rx="98" ry="3" fill="var(--rose-soft)" />
+
+      {/* Drapes and fairy lights */}
+      <path d="M0 0h18q-7 26-3 54-9-2-15 1z" fill="var(--rose-soft)" />
+      <path d="M200 0h-18q7 26 3 54 9-2 15 1z" fill="var(--rose-soft)" />
+      <path d="M2 50q6-3 13 1M198 50q-6-3-13 1" stroke={GOLD} strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M0 4Q50 22 100 6Q150 22 200 4" stroke={GOLD} strokeWidth=".5" />
+      {BULBS.map(([x, y], i) => (
+        <circle key={i} className="bulb" cx={x} cy={y + 1.6} r="1.4" fill={BULB_COLORS[i % 4]}
+          style={{ animationDelay: (i % 5) * -0.37 + "s" }} />
+      ))}
+
+      {/* The stage, with a ring of flowers behind the couple's sofa */}
+      <circle cx="100" cy="56" r="24" stroke="var(--sage)" strokeWidth="1.6" />
+      <circle cx="100" cy="56" r="21" stroke={GOLD} strokeWidth=".6" strokeDasharray="1 2.5" />
+      {RING.map((a, i) => (
+        <Flower key={a} x={100 + 24 * Math.cos((a * Math.PI) / 180)} y={56 + 24 * Math.sin((a * Math.PI) / 180)}
+          r={i % 2 ? 3.4 : 4.4} c={i % 2 ? "#E3A9AE" : "var(--rose)"} />
+      ))}
+      <rect x="58" y="86" width="84" height="14" fill="#F3E6D0" />
+      <path d="M58 86.4h84" stroke={GOLD} strokeWidth=".9" />
+      {Array.from({ length: 14 }, (_, i) => (
+        <circle key={i} cx={61 + i * 6} cy={89 + (i % 2) * 1.2} r=".9" fill={MARIGOLD[i % 3]} />
+      ))}
+      <rect x="46" y="93" width="12" height="7" fill="#EADBC1" />
+      <rect x="52" y="86" width="6" height="7" fill="#EADBC1" />
+      <path d="M46 93.3h6M52 86.3h6" stroke={GOLD} strokeWidth=".6" />
+      <Gift x={124} y={80} fill={WINE} /><Gift x={131} y={81} w={6} h={5} fill="var(--sage)" />
+      <Gift x={127} y={74.5} w={6} h={5.4} fill={YELLOW} />
+
+      <path d="M80 76V64q0-6 6-6h28q6 0 6 6v12z" fill={WINE} stroke={GOLD} strokeWidth=".9" />
+      <Waver x={93} y={84} side="l" arm={[3, 7]} kind="bride" />
+      <Waver x={107} y={84} side="r" arm={[-3, 7]} kind="groom" />
+      <rect x="80" y="74" width="40" height="12" rx="2" fill="var(--rose)" />
+      <path d="M81 74.6h38" stroke={GOLD} strokeWidth=".7" />
+      <rect x="77" y="69" width="5" height="17" rx="2.4" fill={GOLD} />
+      <rect x="118" y="69" width="5" height="17" rx="2.4" fill={GOLD} />
+
+      {/* A guest climbs up to the couple with a gift, leaves it and heads back down */}
+      <Gift x={57} y={80} fill={ORANGE} cls="gift-left" />
+      <g className="guest">
+        <g className="bob">
+          <Mini x={20} y={100} kind="woman" top={ORANGE} skirt="var(--sage)" arms={[[2, 6], [-2, 6]]} />
+          <Gift x={16.5} y={79.5} fill={ORANGE} cls="gift-carried" />
+        </g>
+      </g>
+      <text className="cheers" x="56" y="47" textAnchor="middle" fill="var(--rose)"
+        fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize="6.5">Congratulations!</text>
+
+      {/* The buffet: an aunty stirring the pot, and the kid helping himself to a laddoo */}
+      <Mini x={172} y={100} kind="woman" top="var(--sage)" skirt={YELLOW} arms={[[-2, 11], [8, 2]]} />
+      <path className="ladle" d="M184 79l3 7" stroke={GOLD} strokeWidth="1" strokeLinecap="round" />
+      <path d="M180 88a7 4.6 0 0 0 14 0z" fill={WHITE} stroke={LINEN} strokeWidth=".6" />
+      <g className="vapor" stroke={GOLD} strokeWidth=".7" strokeLinecap="round">
+        <path className="v1" d="M184 84q-1.4-2.4 0-4.8t0-4.8" /><path className="v2" d="M189 84q-1.4-2.4 0-4.8t0-4.8" />
+      </g>
+      <rect x="148" y="88" width="50" height="12" fill="var(--rose-soft)" />
+      <path d="M148 88.4h50M148 92q3.1 2.2 6.25 0t6.25 0 6.25 0 6.25 0 6.25 0 6.25 0 6.25 0 6.25 0" stroke={GOLD} strokeWidth=".6" />
+      <ellipse cx="156" cy="87.6" rx="6" ry="1.4" fill={WHITE} stroke={LINEN} strokeWidth=".5" />
+      {[[153, 86], [156, 86], [159, 86], [154.5, 83.6], [157.5, 83.6]].map(([x, y]) => (
+        <circle key={x + "-" + y} cx={x} cy={y} r="1.5" fill="#E8A33D" />
+      ))}
+      <circle className="laddoo" cx="156" cy="81.4" r="1.5" fill="#E8A33D" />
+      <g transform="translate(140 100) scale(.7) translate(-140 -100)">
+        <Mini x={140} y={100} kind="man" top={BLUE} arms={[[-2, 11], [10, -3]]} />
+      </g>
+      <text className="yum" x="137" y="70" textAnchor="middle" fill="var(--rose)"
+        fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize="6">yum!</text>
+      <text className="hey" x="172" y="62" textAnchor="middle" fill="var(--rose)"
+        fontFamily="Cormorant Garamond, serif" fontStyle="italic" fontSize="6">hey!</text>
+    </svg>
+  );
+}
+
+function Reception() {
+  const e = RECEPTION;
+  return (
+    <section className="page reception">
+      <PageBg motif="sparkles" />
+      <h2>The reception</h2>
+      <p className="sub">Join us to celebrate</p>
+      <ReceptionScene />
+      <p className="venue-name">{e.place}</p>
+      <p className="addr">
+        {e.host}<br />{fmt(e.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+        {e.time && <><br /><span className="time">{e.time}</span></>}
+        {e.address && <><br />{e.address}</>}
+      </p>
+      <div className="reception-actions">
+        <a className="btn" href={e.mapUrl} target="_blank" rel="noopener noreferrer">Open in Maps</a>
+        <a className="btn ghost" href={e.calUrl} target="_blank" rel="noopener noreferrer">Add to calendar</a>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="page closing">
@@ -1236,6 +1358,146 @@ function Footer() {
 }
 
 /* ---------- App ---------- */
+const PAGES = [
+  ["Save the date", Hero], [C.welcomeTitle, Welcome], ["The venues", Venue],
+  RECEPTION && ["The reception", Reception], ["With love", Footer],
+].filter(Boolean);
+const TURN_MS = 1100;
+const MIN_FIT = 0.72;
+
+// Shows one page at a time. Swipes, the wheel and the arrow keys turn the page once the
+// current page is scrolled to its end in that direction (and has settled there, so reaching
+// the end doesn't also turn it). Dots down the right edge jump straight to a page, and the
+// pill at the bottom names the next one.
+function Pager({ enabled }) {
+  const [at, setAt] = useState(0);
+  const [moved, setMoved] = useState(false);
+  const [more, setMore] = useState(false);
+  const [fitted, setFitted] = useState(0);
+  const slides = useRef([]);
+  const atRef = useRef(0);
+  const busy = useRef(false);
+  atRef.current = at;
+
+  const last = at === PAGES.length - 1;
+  const go = useCallback((n) => {
+    if (n < 0 || n >= PAGES.length || n === atRef.current || busy.current) return;
+    busy.current = true;
+    setTimeout(() => (busy.current = false), TURN_MS);
+    setMoved(true);
+    setAt(n);
+  }, []);
+
+  // A page taller than the screen has its contents shrunk to fit (its frame and background
+  // stay full size); below MIN_FIT it scrolls instead
+  useEffect(() => {
+    const fit = () => {
+      slides.current.forEach((el) => {
+        const page = el.firstElementChild;
+        const css = getComputedStyle(page);
+        const pad = parseFloat(css.paddingTop) + parseFloat(css.paddingBottom);
+        // Text doesn't shrink exactly in proportion, so refine over a few passes
+        let f = 1;
+        page.style.setProperty("--fit", 1);
+        for (let k = 0; k < 4 && page.offsetHeight > el.clientHeight + 1 && f > MIN_FIT; k++) {
+          f = Math.max(MIN_FIT, f * (el.clientHeight - pad) / (page.offsetHeight - pad) - 0.005);
+          page.style.setProperty("--fit", f.toFixed(3));
+        }
+      });
+      setFitted((n) => n + 1);
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  // Whether the current page has more below; its bottom then fades under the pill, and the
+  // pill scrolls down before it turns the page
+  useEffect(() => {
+    slides.current.forEach((el, k) => (el.inert = k !== at));
+    const el = slides.current[at];
+    const check = () => setMore(el.scrollTop + el.clientHeight < el.scrollHeight - 2);
+    check();
+    el.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => {
+      el.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, [at, fitted]);
+
+  const next = () => {
+    const el = slides.current[at];
+    if (more) el.scrollBy({ top: el.clientHeight * 0.8, behavior: "smooth" });
+    else go(last ? 0 : at + 1);
+  };
+
+  useEffect(() => {
+    if (!enabled) return;
+    const atEdge = (dir) => {
+      const el = slides.current[atRef.current];
+      return dir > 0 ? el.scrollTop + el.clientHeight >= el.scrollHeight - 2 : el.scrollTop <= 0;
+    };
+    let scrolledAt = 0;
+    const onScroll = () => (scrolledAt = Date.now());
+    const onWheel = (e) => {
+      const dir = Math.sign(e.deltaY);
+      if (Math.abs(e.deltaY) > 24 && atEdge(dir) && Date.now() - scrolledAt > 350) go(atRef.current + dir);
+    };
+    // A swipe turns the page only if the page was already at that end when it began
+    let y0 = null, edges = {};
+    const onTouchStart = (e) => {
+      y0 = e.touches[0].clientY;
+      edges = { 1: atEdge(1), [-1]: atEdge(-1) };
+    };
+    const onTouchEnd = (e) => {
+      const dy = y0 - e.changedTouches[0].clientY, dir = Math.sign(dy);
+      if (y0 !== null && Math.abs(dy) > 50 && edges[dir]) go(atRef.current + dir);
+      y0 = null;
+    };
+    const onKey = (e) => {
+      const dir = { ArrowDown: 1, PageDown: 1, ArrowUp: -1, PageUp: -1 }[e.key];
+      if (dir) { e.preventDefault(); go(atRef.current + dir); }
+    };
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [enabled, go]);
+
+  return (
+    <div className={"pager" + (moved ? " moved" : "") + (more ? " more" : "")}>
+      {PAGES.map(([label, Page], k) => (
+        <div key={label} ref={(el) => (slides.current[k] = el)} aria-hidden={k !== at}
+          className={"slide " + (k === at ? "current" : k < at ? "past" : "future")}>
+          <Page />
+        </div>
+      ))}
+      <nav className="pager-dots" aria-label="Pages">
+        {PAGES.map(([label], k) => (
+          <button key={label} className="dot" aria-label={label} aria-current={k === at ? "page" : undefined}
+            onClick={() => go(k)} />
+        ))}
+      </nav>
+      <button className={"next" + (last && !more ? " up" : "")} onClick={next}>
+        <span className="next-kicker">{more ? "Scroll" : last ? "Back to" : "Next"}</span>
+        <span className="next-label">{more ? "for more" : last ? "the start" : PAGES[at + 1][0]}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+          strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
   const [unlocked, setUnlocked] = useState(false);
 
@@ -1252,10 +1514,7 @@ export default function App() {
       <Cover onDone={() => setUnlocked(true)} />
       <div className="screen" id="screen">
         <main className="app">
-          <Hero />
-          <Welcome />
-          <Venue />
-          <Footer />
+          <Pager enabled={unlocked} />
         </main>
       </div>
     </div>
